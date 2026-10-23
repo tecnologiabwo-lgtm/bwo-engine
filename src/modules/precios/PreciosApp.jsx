@@ -21,7 +21,8 @@ function Row({ item, onSaved, onDeleted }) {
     if (!(d.price >= 0)) { toast("Precio inválido", "error"); return; }
     setBusy(true);
     try {
-      const row = { ...d, price: +d.price, price_year: d.price_year === "" || d.price_year == null ? null : +d.price_year, updated_at: new Date().toISOString() };
+      const row = { ...d, price: +d.price, price_year: d.price_year === "" || d.price_year == null ? null : +d.price_year,
+        setup_price: d.setup_price === "" || d.setup_price == null ? null : +d.setup_price, updated_at: new Date().toISOString() };
       delete row.isNew;
       await run(supabase.from("price_catalog").upsert(row));
       toast(`«${d.name}» guardado`); onSaved();
@@ -44,6 +45,17 @@ function Row({ item, onSaved, onDeleted }) {
         {d.category === "clientify"
           ? <Field label="Precio anual" className="md:col-span-2"><Input type="number" min="0" step="0.01" value={d.price_year ?? ""} onChange={(e) => set("price_year", e.target.value)} /></Field>
           : <Field label="Etiqueta" className="md:col-span-2"><Input value={d.badge || ""} onChange={(e) => set("badge", e.target.value || null)} /></Field>}
+        {(d.category === "program" || d.setup_price != null) && <>
+          <Field label="Fase I · pago único" className="md:col-span-2"><Input type="number" min="0" step="0.01" value={d.setup_price ?? ""} onChange={(e) => set("setup_price", e.target.value === "" ? null : e.target.value)} /></Field>
+          <Field label="Mensualidad empieza" className="md:col-span-2">
+            <Select value={d.meta?.starts_month || 1} onChange={(e) => set("meta", { ...(d.meta || {}), starts_month: +e.target.value })}>
+              <option value={1}>Mes 1 (con la primera cuota)</option><option value={2}>Mes 2 (después de la Fase I)</option>
+            </Select>
+          </Field>
+          <Field label="Excluye (ids, separados por coma)" className="md:col-span-4" hint="No se pueden contratar a la vez">
+            <Input value={(d.meta?.excludes || []).join(", ")} onChange={(e) => set("meta", { ...(d.meta || {}), excludes: e.target.value.split(",").map((x) => x.trim()).filter(Boolean) })} />
+          </Field>
+        </>}
         <Field label="Color" className="md:col-span-2">
           <div className="flex gap-2"><input type="color" value={d.color || "#6C3BF5"} onChange={(e) => set("color", e.target.value)} className="h-9 w-10 cursor-pointer rounded-lg border border-white/10 bg-transparent" />
             <Input value={d.color || ""} placeholder="sin color" onChange={(e) => set("color", e.target.value || null)} /></div>
@@ -57,7 +69,7 @@ function Row({ item, onSaved, onDeleted }) {
         <Badge color="slate">{d.id}</Badge>
         <button onClick={() => set("active", !d.active)} className="inline-flex items-center gap-1 rounded-lg bg-white/5 px-2 py-1 text-xs text-slate-300"><Power className="size-3" />{d.active ? "Activo" : "Inactivo"}</button>
         <button onClick={() => set("public", !d.public)} className="inline-flex items-center gap-1 rounded-lg bg-white/5 px-2 py-1 text-xs text-slate-300">{d.public ? <Eye className="size-3" /> : <EyeOff className="size-3" />}{d.public ? "Visible para clientes" : "Solo agencia"}</button>
-        <span className="ml-auto text-xs text-slate-400">{money(+d.price)} {UNITS[d.unit]}</span>
+        <span className="ml-auto text-xs text-slate-400">{d.setup_price > 0 && `Fase I ${money(+d.setup_price)} · `}{money(+d.price)} {UNITS[d.unit]}</span>
         <Button size="sm" variant="ghost" onClick={del}><Trash2 className="size-3.5" /></Button>
         <Button size="sm" onClick={save} loading={busy} disabled={!dirty}><Save className="size-3.5" />Guardar</Button>
       </div>
@@ -98,7 +110,7 @@ function Settings({ settings, onSaved }) {
 export default function PreciosApp() {
   const { items, settings, source, error, reload } = useCatalog();
   const [extra, setExtra] = useState([]);
-  const [cat, setCat] = useState("plan");
+  const [cat, setCat] = useState("program");
   if (source === "loading") return <Spinner />;
   const list = [...items, ...extra].filter((i) => i.category === cat).sort((a, b) => a.sort - b.sort);
   const add = () => {
@@ -106,7 +118,7 @@ export default function PreciosApp() {
     if (!name) return;
     const id = `${cat}_${slug(name)}`;
     if ([...items, ...extra].some((i) => i.id === id)) { alert("Ya existe un ítem con ese nombre en esta categoría."); return; }
-    setExtra((x) => [...x, { id, category: cat, name, description: "", price: 0, price_year: null, unit: cat === "plan" || cat === "crm" ? "mes" : "unico", badge: null, color: null, features: [], meta: {}, sort: (list.at(-1)?.sort || 0) + 10, active: true, public: true, isNew: true }]);
+    setExtra((x) => [...x, { id, category: cat, name, description: "", price: 0, price_year: null, unit: ["plan", "crm", "program"].includes(cat) ? "mes" : "unico", setup_price: cat === "program" ? 0 : null, badge: null, color: null, features: [], meta: cat === "program" ? { starts_month: 2 } : {}, sort: (list.at(-1)?.sort || 0) + 10, active: true, public: true, isNew: true }]);
   };
   return (
     <div>

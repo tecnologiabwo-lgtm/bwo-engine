@@ -6,7 +6,7 @@ reportes, Cotizador, Calculadora ROI y catálogo de precios, con login y dos rol
 | Rol | Quién | Qué puede hacer |
 |---|---|---|
 | `admin` | Agencia | Todo: cargar datos, editar precios, publicar reportes, dar accesos |
-| `viewer` | Cliente | Solo lo de sus clientes: aprobar/pedir cambios en posts y guiones, ver reportes, autocotizarse, usar la calculadora |
+| `viewer` | Cliente (se registra y la agencia lo verifica) | Solo lo de sus clientes: aprobar/pedir cambios en posts y guiones, ver reportes, autocotizarse, usar la calculadora |
 
 La seguridad real está en Supabase (políticas RLS y funciones `security definer`); el menú solo oculta lo que el rol no usa.
 
@@ -51,7 +51,7 @@ legacy/           HTML originales de referencia (calculadora, sala)
 
 ## Base de datos
 
-Aplicar en Supabase → SQL Editor, en orden: `0005_engine_core.sql`, `0006_price_seed.sql`
+Aplicar en Supabase → SQL Editor, en orden: `0005_engine_core.sql`, `0006_price_seed.sql`, `0007_auth_registro.sql`, `0008_programas.sql`
 (0003 y 0004 ya estaban aplicadas por el Feed Planner). Son aditivas: no borran datos.
 Los usuarios que ya existían quedan como `admin`; toda cuenta nueva nace como `viewer`.
 
@@ -69,3 +69,5 @@ npm run build
 Ver `.env.example`. El frontend trae por defecto la URL y la clave publicable del proyecto.
 Para la IA del Consolidador: `ANTHROPIC_API_KEY` (u `OPENAI_API_KEY` / `GOOGLE_API_KEY`) y,
 opcional, `<PROVEEDOR>_MODEL`. El modelo también se puede elegir en pantalla.
+
+Seguridad, registro y sesiones: ver `docs/SEGURIDAD.md`.

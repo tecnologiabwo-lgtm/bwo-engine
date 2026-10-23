@@ -19,7 +19,21 @@ export default function TextAnimation({
     hidden: {},
     visible: { transition: { staggerChildren: stagger ?? (letterAnime ? 0.025 : lineAnime ? 0.18 : 0.08) } },
   };
-  const parts = lineAnime ? String(text).split("\n") : letterAnime ? Array.from(String(text)) : String(text).split(" ");
+  // Por letra: cada palabra va en un bloque que no se parte al saltar de línea
+  if (letterAnime) {
+    const words = String(text).split(" ");
+    return (
+      <Tag className={cn(classname, className)} initial="hidden" whileInView="visible" viewport={{ once, amount: 0.4 }} variants={container} aria-label={text}>
+        {words.map((w, wi) => (
+          <span key={wi} aria-hidden="true" className="inline-block whitespace-nowrap">
+            {Array.from(w).map((ch, i) => <motion.span key={i} variants={base} className="inline-block will-change-transform">{ch}</motion.span>)}
+            {wi < words.length - 1 && <span className="inline-block">&nbsp;</span>}
+          </span>
+        ))}
+      </Tag>
+    );
+  }
+  const parts = lineAnime ? String(text).split("\n") : String(text).split(" ");
   return (
     <Tag
       className={cn(classname, className)}
@@ -30,14 +44,8 @@ export default function TextAnimation({
       aria-label={text}
     >
       {parts.map((p, i) => (
-        <motion.span
-          key={i}
-          aria-hidden="true"
-          variants={base}
-          className={cn(lineAnime ? "block" : "inline-block", "will-change-transform")}
-          style={letterAnime && p === " " ? { width: "0.28em" } : undefined}
-        >
-          {letterAnime ? p : lineAnime ? p : `${p} `}
+        <motion.span key={i} aria-hidden="true" variants={base} className={cn(lineAnime ? "block" : "inline-block", "will-change-transform")}>
+          {lineAnime ? p : `${p}\u00A0`}
         </motion.span>
       ))}
     </Tag>

@@ -40,8 +40,13 @@ function ItemCard({ item, sel, onToggle, onQty, onBilling, qtyMode }) {
           {!!item.features?.length && <ul className="mt-2 grid gap-x-4 gap-y-0.5 text-[11px] text-slate-300 sm:grid-cols-2">{item.features.map((f) => <li key={f}>· {f}</li>)}</ul>}
         </button>
         <div className="text-right">
+          {item.setup_price > 0 ? (<>
+            <div className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Fase I</div>
+            <div className="text-lg font-black text-white">{money(item.setup_price)}<span className="ml-1 text-[11px] font-normal text-slate-400">pago único</span></div>
+            <div className="mt-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Fase II{item.meta?.from_price ? " · desde" : ""}</div>
+          </>) : null}
           <div className="text-xl font-black" style={{ color: item.color || "#fff" }}>{money(sel?.billing === "anio" ? item.price_year : item.price)}</div>
-          <div className="text-[11px] text-slate-400">{sel?.billing === "anio" ? "/ año (por adelantado)" : UNITS[item.unit]}</div>
+          <div className="text-[11px] text-slate-400">{sel?.billing === "anio" ? "/ año (por adelantado)" : UNITS[item.unit]}{item.meta?.starts_month > 1 ? ` desde el mes ${item.meta.starts_month}` : ""}</div>
           {qtyMode && <div className="mt-2"><Stepper value={sel?.qty || 0} onChange={onQty} /></div>}
         </div>
       </div>
@@ -60,7 +65,7 @@ function ItemCard({ item, sel, onToggle, onQty, onBilling, qtyMode }) {
 }
 
 function Summary({ q, taxLabel, taxRate, onCopy, copied }) {
-  const groups = [["unico", "Pagos únicos"], ["anual", "Anual (por adelantado)"], ["mensual", "Mensual recurrente"]];
+  const groups = [["unico", "Pagos únicos · primera cuota"], ["anual", "Anual (por adelantado)"], ["mensual", "Mensual recurrente"]];
   return (
     <Card className="lg:sticky lg:top-5">
       <div className="mb-4 flex items-center gap-2 text-sm font-bold text-white"><Sparkles className="size-4 text-bwo-amber" />Resumen de inversión</div>
@@ -87,7 +92,7 @@ function Summary({ q, taxLabel, taxRate, onCopy, copied }) {
       <div className="mt-4 rounded-xl p-4" style={{ background: "linear-gradient(135deg,rgba(108,59,245,.35),rgba(230,25,126,.25))" }}>
         <div className="text-[11px] font-semibold uppercase tracking-widest text-slate-200">Primera cuota</div>
         <AnimatedNumber value={q.firstTotal} className="text-4xl font-black text-white" />
-        <div className="mt-3 flex justify-between text-sm"><span className="text-slate-200">Luego, cada mes</span><AnimatedNumber value={q.monthlyTotal} className="font-bold text-white" /></div>
+        <div className="mt-3 flex justify-between text-sm"><span className="text-slate-200">{q.monthlyStarts > 1 ? "Desde el mes 2, cada mes" : "Luego, cada mes"}</span><AnimatedNumber value={q.monthlyTotal} className="font-bold text-white" /></div>
         <div className="mt-1 flex justify-between text-xs text-slate-300"><span>Inversión primer año</span><AnimatedNumber value={q.yearOne} /></div>
       </div>
       {onCopy && <Button variant="ghost" className="mt-3 w-full" onClick={onCopy} disabled={!q.lines.length}>{copied ? <Check className="size-4" /> : <Copy className="size-4" />}{copied ? "Copiado" : "Copiar para WhatsApp"}</Button>}
@@ -158,7 +163,8 @@ export default function CotizadorApp() {
   const text = () => {
     let t = `*PROPUESTA COMERCIAL | BIG WAY OFFICES*\n\nHola *${contact.name || "Estimado(a)"}*${contact.company ? ` (${contact.company})` : ""}, este es el resumen de inversión:\n\n`;
     q.lines.forEach((l) => { t += `• ${l.name}${l.qty > 1 ? ` ×${l.qty}` : ""}: ${money(l.net)}${l.kind === "mensual" ? "/mes" : l.kind === "anual" ? "/año" : ""}\n`; });
-    t += `\n*Primera cuota:* ${money(q.firstTotal)}\n*Mensualidad:* ${money(q.monthlyTotal)}/mes\n`;
+    t += `\n*Primera cuota:* ${money(q.firstTotal)}\n*Mensualidad${q.monthlyStarts > 1 ? " (desde el mes 2)" : ""}:* ${money(q.monthlyTotal)}/mes\n`;
+    t += `_La inversión en anuncios y los consumos de WhatsApp API se pagan aparte._\n`;
     if (taxRate > 0) t += `_Incluye ${settings.tax?.label || "impuestos"} (${Math.round(taxRate * 100)}%)_\n`;
     t += `\nVigencia: ${validity} días\n${settings.quote_footer || ""}`;
     return t;
@@ -193,7 +199,7 @@ export default function CotizadorApp() {
   };
 
   const cats = CATEGORIES.map((c) => ({ ...c, items: catalog.filter((i) => i.category === c.key) })).filter((c) => c.items.length);
-  const qtyMode = (c) => ["clientify", "event", "support"].includes(c.key);
+  const qtyMode = (c) => ["clientify", "event", "support", "addon"].includes(c.key);
 
   return (
     <div>

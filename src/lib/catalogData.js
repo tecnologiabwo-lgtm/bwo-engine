@@ -1,8 +1,10 @@
 /* Catálogo por defecto — datos puros (sin React ni Supabase) para poder probarlos.
    Idéntico a supabase/migrations/0006_price_seed.sql. */
 export const CATEGORIES = [
-  { key: "plan", label: "Contenido estratégico + Ads + CRM", group: "base", hint: "Elige un plan (excluye «Solo CRM + ADS»)" },
-  { key: "crm", label: "Solo CRM + ADS", group: "base", hint: "Sin gestión de redes sociales" },
+  { key: "program", label: "Programas BWO", hint: "Fase I: pago único el primer mes · Fase II: mensualidad desde el segundo mes" },
+  { key: "addon", label: "Complementos de programa", hint: "Se suman a la mensualidad" },
+  { key: "plan", label: "Planes anteriores", group: "base" },
+  { key: "crm", label: "Solo CRM + ADS (anterior)", group: "base" },
   { key: "clientify", label: "Plataforma Clientify", hint: "Mensual o anual (el anual se paga por adelantado)" },
   { key: "web", label: "Desarrollo web", group: "web", hint: "Proyecto de pago único" },
   { key: "advisory", label: "Asesoría & consultoría", group: "advisory" },
@@ -11,21 +13,42 @@ export const CATEGORIES = [
   { key: "support_pack", label: "Soporte puntual", group: "support_pack" },
   { key: "setup", label: "Configuraciones iniciales", hint: "Pagos únicos" },
 ];
-export const UNITS = { unico: "pago único", mes: "/ mes", hora: "/ hora", dia: "/ día", sesion: "/ sesión", pack: "pack" };
+export const UNITS = { unico: "pago único", mes: "/ mes", hora: "/ hora", dia: "/ día", sesion: "/ sesión", pack: "pack", linea: "/ línea al mes", usuario: "/ usuario al mes" };
 
 const f = (id, category, name, description, price, unit, extra = {}) =>
-  ({ id, category, name, description, price, unit, price_year: null, badge: null, color: null, features: [], meta: {}, active: true, public: true, sort: 0, ...extra });
+  ({ id, category, name, description, price, unit, price_year: null, setup_price: null, badge: null, color: null, features: [], meta: {}, active: true, public: true, sort: 0, ...extra });
+
+const P = (id, name, description, setup, price, color, features, meta, sort, extra = {}) =>
+  f(id, "program", name, description, price, "mes", { setup_price: setup, color, features, meta: { starts_month: 2, ...meta }, sort, ...extra });
 
 export const DEFAULT_CATALOG = [
-  f("plan_turquoise", "plan", "Plan Turquoise", "Ideal para iniciar presencia estratégica y captación B2B", 350, "mes", { color: "#22D3C5", sort: 10,
+  P("prog_01", "Programa 01 · Presencia Digital B2B", "Contenido e imagen para Instagram y Facebook.", 0, 0, "#22D3C5", ["Precio pendiente de cargar"], { excludes: ["prog_02", "prog_03"], num: 1 }, 1, { active: false }),
+  P("prog_02", "Programa 02 · La Máquina de Facturación B2B", "Capte nuevos compradores y organice el seguimiento de sus ventas. Contenido, Meta Ads y CRM Clientify.", 450, 650, "#6C3BF5",
+    ["16 piezas al mes: 8 imágenes/carruseles y 8 Reels con guion y edición", "Historias semanales", "Campañas de Meta Ads con formularios de precalificación", "1 usuario máster de Clientify con automatizaciones", "Hasta 8 horas de acompañamiento al mes", "Reporte mensual de publicidad y CRM · Project Manager"],
+    { excludes: ["prog_01", "prog_03", "prog_04"], num: 2 }, 2, { badge: "EL MÁS COMPLETO EN META" }),
+  P("prog_03", "Programa 03 · Expansión Corporativa Multicanal", "Contenido, anuncios en Meta y Google, y Clientify para hasta 4 usuarios.", 600, 950, "#E6197E",
+    ["24 piezas al mes: 12 imágenes/carruseles y 12 Reels", "2 historias diarias", "Meta Ads y Google Ads (búsqueda)", "Clientify hasta 4 usuarios con embudo por vendedor", "Instagram automatizado y correo de seguimiento", "Hasta 8 horas de acompañamiento · reporte por vendedor"],
+    { excludes: ["prog_01", "prog_02", "prog_04"], num: 3 }, 3, { badge: "MULTICANAL" }),
+  P("prog_04", "Programa 04 · Integración Comercial CRM", "Clientify para ordenar clientes y ventas, con capacitación y 1 usuario máster.", 250, 150, "#F5A623",
+    ["1 usuario máster de Clientify (renovación mensual)", "Etapas de venta, contactos y oportunidades", "WhatsApp Business, Instagram y Facebook conectados", "Capacitación práctica en su empresa", "Soporte en días hábiles, respuesta inicial ≤ 24 h", "Hasta 8 horas de acompañamiento · reporte de gestión comercial"],
+    { excludes: ["prog_02", "prog_03"], num: 4 }, 4),
+  P("prog_05", "Programa 05 · Centralización y WhatsApp API", "Bandeja de WhatsApp, chatbot y 1 usuario máster. Montaje previsto en 1 semana.", 150, 55, "#22D3C5",
+    ["1 línea de WhatsApp conectada a la API oficial de Meta", "Clientify Inbox con 1 usuario máster", "Chatbot con menú, bienvenida y ausencia", "1 capacitación online", "Supervisión de la conexión y soporte técnico", "Los consumos de WhatsApp API se pagan aparte a Meta"],
+    { num: 5 }, 5),
+  P("prog_06", "Programa 06 · Comercio Electrónico y Tienda Virtual", "Sellibrí y carga inicial de hasta 50 productos. Primer mes de gestión incluido.", 500, 150, "#A78BFA",
+    ["Tienda Sellibrí con la imagen de su marca", "Hasta 50 referencias (SKU) con categorías y variantes", "Pago Móvil, transferencias o Zelle · envíos y delivery", "Plan START de Sellibrí incluido", "1 banner mensual y reporte con 2–3 recomendaciones", "Manual PDF y capacitación en vivo de 60 min"],
+    { num: 6, from_price: true }, 6, { badge: "DESDE" }),
+  f("wa_line", "addon", "Línea adicional de WhatsApp", "Por línea, sobre el Programa 05", 15, "linea", { meta: { requires: "prog_05" }, sort: 7 }),
+
+  f("plan_turquoise", "plan", "Plan Turquoise", "Ideal para iniciar presencia estratégica y captación B2B", 350, "mes", { active: false, color: "#22D3C5", sort: 10,
     features: ["4 post · 4 carruseles · 8 reels · 16 historias", "1 pauta/mes", "4 pub/sem · 7 historias/sem", "Optimización semanal CPL", "WhatsApp API + redes", "Pipeline", "Plantillas + seguimiento", "SLA + alertas"] }),
-  f("plan_cerise", "plan", "Plan Cerise", "Plan integral balanceado con retargeting activo", 450, "mes", { color: "#E6197E", badge: "EL MÁS VENDIDO", sort: 20,
+  f("plan_cerise", "plan", "Plan Cerise", "Plan integral balanceado con retargeting activo", 450, "mes", { active: false, color: "#E6197E", badge: "EL MÁS VENDIDO", sort: 20,
     features: ["6 post · 6 carruseles · 8 reels · 20 historias", "1-2 pautas/mes", "4-6 pub/sem · 7 historias/sem", "Captación + Retargeting", "Pipeline + protocolos", "Automatizaciones + reactivación", "Integraciones + dashboards"] }),
-  f("plan_crayola", "plan", "Plan Crayola", "Dominio de marca con dirección creativa B2B", 750, "mes", { color: "#F5A623", badge: "MÁXIMA ESCALA", sort: 30,
+  f("plan_crayola", "plan", "Plan Crayola", "Dominio de marca con dirección creativa B2B", 750, "mes", { active: false, color: "#F5A623", badge: "MÁXIMA ESCALA", sort: 30,
     features: ["4 post · 8 carruseles · 12 reels · 24 historias", "2 pautas/mes", "6 pub/sem · 14 historias/sem", "Captación + Retargeting + Dirección creativa", "WhatsApp API multicanal", "Pipeline avanzado + automatizaciones", "Dashboards en tiempo real"] }),
-  f("setup_social", "setup", "Configuración inicial & Onboarding (Fase 1)", "Pago único al contratar un plan", 350, "unico", { meta: { for: "plan" }, sort: 40 }),
-  f("crm_ads_monthly", "crm", "Plan mensual CRM + ADS", "Sin gestión de redes: embudo + Business Manager + monitoreo", 150, "mes", { color: "#6C3BF5", sort: 50 }),
-  f("crm_ads_setup", "setup", "Configuración inicial CRM + ADS", "Pago único", 250, "unico", { meta: { for: "crm" }, sort: 60 }),
+  f("setup_social", "setup", "Configuración inicial & Onboarding (Fase 1)", "Pago único al contratar un plan", 350, "unico", { active: false, meta: { for: "plan" }, sort: 40 }),
+  f("crm_ads_monthly", "crm", "Plan mensual CRM + ADS", "Sin gestión de redes: embudo + Business Manager + monitoreo", 150, "mes", { active: false, color: "#6C3BF5", sort: 50 }),
+  f("crm_ads_setup", "setup", "Configuración inicial CRM + ADS", "Pago único", 250, "unico", { active: false, meta: { for: "crm" }, sort: 60 }),
   f("cf_plat", "clientify", "Acceso a la plataforma Clientify", "1 usuario + 1.000 contactos mkt", 65, "mes", { price_year: 468, badge: "Incluido en planes", meta: { group: "Plataforma base" }, sort: 100 }),
   f("cf_user", "clientify", "Usuario adicional", "Licencia por usuario extra", 25, "mes", { price_year: 180, meta: { group: "Usuarios y gestión" }, sort: 110 }),
   f("cf_adv", "clientify", "Gestión avanzada de usuarios", "Permisos granulares y auditoría", 12, "mes", { price_year: 86, meta: { group: "Usuarios y gestión" }, sort: 120 }),

@@ -21,5 +21,10 @@
 <div id="selRoot"></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script type="module" src="./src/js/pages/cliente.js"></script>
+<script>
+/* Actividad compartida con BWO Engine (expiración de sesión por inactividad) */
+(function(){var t=0;function m(){var n=Date.now();if(n-t>5000){t=n;try{localStorage.setItem('bwo.lastActivity',String(n));}catch(e){}}}
+['pointerdown','keydown','scroll','touchstart','wheel'].forEach(function(e){addEventListener(e,m,{passive:true});});})();
+</script>
 </body>
 </html>

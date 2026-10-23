@@ -59,10 +59,47 @@ eq("CRM excluye plan y su setup", Object.keys(s).sort(), ["crm", "setup_crm"]);
 s = toggleItem(CAT, s, "crm", CATS);
 eq("tocar de nuevo lo quita", Object.keys(s).sort(), ["setup_crm"]);
 
+/* Programas: Fase I en la primera cuota, Fase II desde el mes 2 */
+const PROG = [
+  { id: "p2", category: "program", price: 650, setup_price: 450, unit: "mes", meta: { starts_month: 2, excludes: ["p3", "p4"] } },
+  { id: "p3", category: "program", price: 950, setup_price: 600, unit: "mes", meta: { starts_month: 2, excludes: ["p2", "p4"] } },
+  { id: "p4", category: "program", price: 150, setup_price: 250, unit: "mes", meta: { starts_month: 2, excludes: ["p2", "p3"] } },
+  { id: "p5", category: "program", price: 55, setup_price: 150, unit: "mes", meta: { starts_month: 2 } },
+  { id: "wa", category: "addon", price: 15, unit: "linea", meta: { requires: "p5" } },
+  { id: "cfu", category: "clientify", price: 25, unit: "mes", meta: {} },
+];
+const PCATS = [{ key: "program" }, { key: "addon" }, { key: "clientify" }];
+q = computeQuote(PROG, { p2: { qty: 1 } });
+eq("programa: primera cuota = Fase I", q.firstTotal, 450);
+eq("programa: mensualidad", q.monthlyTotal, 650);
+eq("programa: año 1 = Fase I + 11 mensualidades", q.yearOne, 450 + 650 * 11);
+eq("programa: mensualidad desde el mes 2", q.monthlyStarts, 2);
+eq("programa: dos líneas (Fase I y II)", q.lines.map((l) => l.kind).sort(), ["mensual", "unico"]);
+q = computeQuote(PROG, { p2: { qty: 1 }, cfu: { qty: 2 } });
+eq("programa + Clientify mensual desde mes 1: primera cuota", q.firstTotal, 450 + 50);
+eq("programa + Clientify: año 1", q.yearOne, 450 + 650 * 11 + 50 * 12);
+q = computeQuote(PROG, { p5: { qty: 1 }, wa: { qty: 2 } });
+eq("línea adicional por unidad", q.monthly, 55 + 30);
+q = computeQuote(PROG, { p2: { qty: 1 } }, { setup: 10, services: 20 });
+eq("descuento Fase I usa «configuraciones»", q.lines.find((l) => l.kind === "unico").net, 405);
+eq("descuento Fase II usa «servicios»", q.lines.find((l) => l.kind === "mensual").net, 520);
+q = computeQuote(PROG, { p2: { qty: 1 } }, {}, 0.1);
+eq("impuesto en año 1", q.yearOne, (450 + 650 * 11) * 1.1);
+s = toggleItem(PROG, {}, "p2", PCATS); s = toggleItem(PROG, s, "p3", PCATS);
+eq("programas excluyentes por meta.excludes", Object.keys(s), ["p3"]);
+s = toggleItem(PROG, s, "p5", PCATS);
+eq("P5 se combina con P3", Object.keys(s).sort(), ["p3", "p5"]);
+s = toggleItem(PROG, {}, "wa", PCATS);
+eq("complemento agrega su requisito", Object.keys(s).sort(), ["p5", "wa"]);
+s = toggleItem(PROG, s, "p5", PCATS);
+eq("quitar el requisito quita el complemento", Object.keys(s), []);
+
 if (DEFAULT) {
   const ids = new Set(DEFAULT.map((i) => i.id));
   eq("catálogo: ids únicos", ids.size, DEFAULT.length);
   eq("catálogo: precios válidos", DEFAULT.every((i) => i.price >= 0), true);
+  eq("catálogo: excludes apuntan a ids reales", DEFAULT.every((i) => (i.meta?.excludes || []).every((x) => ids.has(x))), true);
+  eq("catálogo: programas activos con Fase I y II", DEFAULT.filter((i) => i.category === "program" && i.active).every((i) => i.setup_price > 0 && i.price > 0), true);
   eq("catálogo: setups apuntan a categorías reales", DEFAULT.filter((i) => i.meta?.for).every((i) => DEFAULT.some((j) => j.category === i.meta.for)), true);
 }
 

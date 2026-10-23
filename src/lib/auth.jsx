@@ -13,7 +13,9 @@ export function AuthProvider({ children }) {
         run(supabase.from("profiles").select("*").eq("id", session.user.id).maybeSingle()),
         run(supabase.rpc("my_clients")),
       ]);
-      setState({ loading: false, session, profile: profile || { id: session.user.id, email: session.user.email, role: "viewer" }, clients: clients || [], error: "" });
+            // Sin fila de perfil → pendiente. Fila sin columna status (antes de la migración 0007) → activa.
+      const p = profile ? { ...profile, status: profile.status ?? "active" } : { id: session.user.id, email: session.user.email, role: "viewer", status: "pending" };
+      setState({ loading: false, session, profile: p, clients: clients || [], error: "" });
     } catch (e) {
       setState({ loading: false, session, profile: null, clients: [], error: e.message });
     }
@@ -30,7 +32,17 @@ export function AuthProvider({ children }) {
 
   const value = {
     ...state,
-    isAdmin: state.profile?.role === "admin",
+    isAdmin: state.profile?.role === "admin" && state.profile?.status === "active",
+    status: state.profile?.status || "pending",
+    signUp: async ({ email, password, full_name, company, phone, note }) => {
+      const { data, error } = await supabase.auth.signUp({
+        email, password,
+        // El rol y el estado no se envían: el servidor siempre crea la cuenta como espectador pendiente
+        options: { data: { full_name, company, phone, note }, emailRedirectTo: `${location.origin}/login?confirmado=1` },
+      });
+      if (error) throw new Error(/already registered/i.test(error.message) ? "Ese correo ya tiene una cuenta. Inicia sesión o recupera tu contraseña." : error.message);
+      return { needsConfirmation: !data.session };
+    },
     signIn: async (email, password) => {
       const { error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) throw new Error(error.message === "Invalid login credentials" ? "Correo o contraseña incorrectos" : error.message);

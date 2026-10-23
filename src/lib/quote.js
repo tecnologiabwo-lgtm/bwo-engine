@@ -4,15 +4,19 @@
  * discounts: { setup, services, clientify } en % (0–100)
  * taxRate:   fracción (0.21 = 21 %). Se aplica a todo lo cotizado.
  *
+ * Cada ítem puede tener:
+ *   - setup_price            → pago único (Fase I de los programas)
+ *   - price + unit recurrente → mensualidad (Fase II)
+ *   - meta.starts_month = 2  → la mensualidad empieza el segundo mes (no entra en la primera cuota)
+ *
  * Clasificación de cada línea:
- *   - unit "mes"                      → mensual recurrente
- *   - unit "hora" con meta.recurring  → mensual recurrente (horas × tarifa)
- *   - Clientify con billing "anio"    → anual, se paga por adelantado en la primera cuota
- *   - resto (unico, pack, dia, sesion)→ pago único
- * La primera cuota = pagos únicos + anuales + el primer mes de lo recurrente.
+ *   - unit "mes" | "linea" | "usuario", u "hora" con meta.recurring → mensual
+ *   - Clientify con billing "anio" → anual, se paga por adelantado en la primera cuota
+ *   - resto (unico, pack, dia, sesion) → pago único
  */
 const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
 const clampPct = (p) => Math.max(0, Math.min(100, Number(p) || 0)) / 100;
+const RECURRING = new Set(["mes", "linea", "usuario"]);
 
 export function computeQuote(catalog, selection, discounts = {}, taxRate = 0) {
   const byId = new Map(catalog.map((i) => [i.id, i]));
@@ -21,12 +25,20 @@ export function computeQuote(catalog, selection, discounts = {}, taxRate = 0) {
     const item = byId.get(id);
     const qty = Math.max(0, Math.floor(Number(sel?.qty) || 0));
     if (!item || !qty) continue;
+    const bucket = item.category === "setup" ? "setup" : item.category === "clientify" ? "clientify" : "services";
+    // Fase I del programa: pago único, se descuenta con «configuraciones iniciales»
+    if (Number(item.setup_price) > 0) {
+      lines.push({ id: `${id}:fase1`, itemId: id, name: `${item.name} · Fase I`, category: item.category, qty, unitPrice: +item.setup_price,
+        unit: "unico", kind: "unico", bucket: "setup", startsMonth: 1, gross: r2(item.setup_price * qty) });
+    }
+    if (!(Number(item.price) > 0)) continue;
     const annual = item.category === "clientify" && sel.billing === "anio" && item.price_year != null;
-    const recurring = !annual && (item.unit === "mes" || (item.unit === "hora" && item.meta?.recurring));
+    const recurring = !annual && (RECURRING.has(item.unit) || (item.unit === "hora" && item.meta?.recurring));
     const unitPrice = annual ? item.price_year : item.price;
     const kind = annual ? "anual" : recurring ? "mensual" : "unico";
-    const bucket = item.category === "setup" ? "setup" : item.category === "clientify" ? "clientify" : "services";
-    lines.push({ id, name: item.name, category: item.category, qty, unitPrice, unit: annual ? "anio" : item.unit, kind, bucket, gross: r2(unitPrice * qty) });
+    const startsMonth = recurring ? Math.max(1, Math.floor(item.meta?.starts_month || 1)) : 1;
+    lines.push({ id, itemId: id, name: item.setup_price > 0 ? `${item.name} · Fase II` : item.name, category: item.category, qty, unitPrice,
+      unit: annual ? "anio" : item.unit, kind, bucket, startsMonth, gross: r2(unitPrice * qty) });
   }
   const pct = { setup: clampPct(discounts.setup), services: clampPct(discounts.services), clientify: clampPct(discounts.clientify) };
   for (const l of lines) { l.discount = r2(l.gross * pct[l.bucket]); l.net = r2(l.gross - l.discount); }
@@ -35,37 +47,52 @@ export function computeQuote(catalog, selection, discounts = {}, taxRate = 0) {
   const oneTime = sum((l) => l.kind === "unico");
   const annual = sum((l) => l.kind === "anual");
   const monthly = sum((l) => l.kind === "mensual");
+  const monthlyInFirst = sum((l) => l.kind === "mensual" && l.startsMonth <= 1);
   const gross = r2(lines.reduce((a, l) => a + l.gross, 0));
   const discount = r2(lines.reduce((a, l) => a + l.discount, 0));
   const rate = Math.max(0, Number(taxRate) || 0);
-  const firstSub = r2(oneTime + annual + monthly);
+  const firstSub = r2(oneTime + annual + monthlyInFirst);
   const firstTax = r2(firstSub * rate);
   const monthlyTax = r2(monthly * rate);
+  // Primer año: cada mensualidad se cobra desde su mes de inicio hasta el mes 12
+  const recurring12 = lines.filter((l) => l.kind === "mensual").reduce((a, l) => a + l.net * (13 - Math.min(12, l.startsMonth)), 0);
+  const year1Sub = oneTime + annual + recurring12;
+  const deferred = lines.some((l) => l.kind === "mensual" && l.startsMonth > 1);
   return {
     lines,
     oneTime, annual, monthly, gross, discount,
     firstSubtotal: firstSub, firstTax, firstTotal: r2(firstSub + firstTax),
     monthlyTax, monthlyTotal: r2(monthly + monthlyTax),
-    yearOne: r2(firstSub + firstTax + (monthly + monthlyTax) * 11),
+    monthlyStarts: deferred ? 2 : 1,
+    yearOne: r2(year1Sub * (1 + rate)),
   };
 }
 
-/** Aplica las reglas de exclusión del catálogo al elegir un ítem. */
+/** Aplica las reglas del catálogo al elegir un ítem:
+ *  - meta.excludes: ids incompatibles (p. ej. Programa 02 y 03)
+ *  - categoría con group: excluyentes entre sí
+ *  - setup ligado (meta.for = categoría) se sugiere al elegir
+ *  - meta.requires: si se quita el requisito, se quitan sus complementos */
 export function toggleItem(catalog, selection, id, categories) {
   const item = catalog.find((i) => i.id === id);
   if (!item) return selection;
   const next = { ...selection };
-  if (next[id]?.qty) { delete next[id]; return next; }
+  const find = (k) => catalog.find((i) => i.id === k);
+  const dropDependents = () => { for (const k of Object.keys(next)) if (find(k)?.meta?.requires && !next[find(k).meta.requires]) delete next[k]; };
+  if (next[id]?.qty) { delete next[id]; dropDependents(); return next; }
+
+  for (const ex of item.meta?.excludes || []) delete next[ex];
+  for (const k of Object.keys(next)) if ((find(k)?.meta?.excludes || []).includes(id)) delete next[k];
   const group = categories.find((c) => c.key === item.category)?.group;
   if (group) {
     const sameGroup = new Set(categories.filter((c) => c.group === group).map((c) => c.key));
-    for (const k of Object.keys(next)) { const it = catalog.find((i) => i.id === k); if (it && sameGroup.has(it.category)) delete next[k]; }
-    // un setup ligado a la categoría que se apaga también sale
-    for (const k of Object.keys(next)) { const it = catalog.find((i) => i.id === k); if (it?.meta?.for && sameGroup.has(it.meta.for) && it.meta.for !== item.category) delete next[k]; }
+    for (const k of Object.keys(next)) { const it = find(k); if (it && sameGroup.has(it.category)) delete next[k]; }
+    for (const k of Object.keys(next)) { const it = find(k); if (it?.meta?.for && sameGroup.has(it.meta.for) && it.meta.for !== item.category) delete next[k]; }
   }
   next[id] = { qty: 1, billing: "mes" };
-  // Al elegir un plan o CRM se sugiere su configuración inicial
+  if (item.meta?.requires && !next[item.meta.requires]) next[item.meta.requires] = { qty: 1, billing: "mes" };
   const setup = catalog.find((i) => i.category === "setup" && i.meta?.for === item.category && i.active !== false);
   if (setup && !next[setup.id]) next[setup.id] = { qty: 1, billing: "mes" };
+  dropDependents();
   return next;
 }
