@@ -61,13 +61,11 @@ begin
   end if;
   return new;
 end $$;
-drop trigger if exists profiles_protect on profiles;
-create trigger profiles_protect before update on profiles for each row execute function protect_profile();
+create or replace trigger profiles_protect before update on profiles for each row execute function protect_profile();
 
-drop policy if exists self_update_name on profiles;
-drop policy if exists self_update on profiles;
-create policy self_update on profiles for update to authenticated using (id = auth.uid()) with check (id = auth.uid());
-drop policy if exists admin_update on profiles;
+-- (sin DROP) la protección de columnas la hace el trigger; la política queda simple
+alter policy self_update_name on profiles rename to self_update;
+alter policy self_update on profiles using (id = auth.uid()) with check (id = auth.uid());
 create policy admin_update on profiles for update to authenticated using (is_admin()) with check (is_admin());
 
 -- Verificación del registro por la agencia
@@ -135,13 +133,9 @@ returns boolean language sql stable security definer set search_path = public as
 $$;
 grant execute on function is_active() to authenticated;
 
-drop policy if exists read_public on price_catalog;
-create policy read_public on price_catalog for select to authenticated using (active and public and is_active());
-drop policy if exists read_all on app_settings;
-create policy read_all on app_settings for select to authenticated using (is_active() or key = 'session');
-drop policy if exists viewer_request on quotes;
-create policy viewer_request on quotes for insert to authenticated
+alter policy read_public on price_catalog using (active and public and is_active());
+alter policy read_all on app_settings using (is_active() or key = 'session');
+alter policy viewer_request on quotes
   with check (is_active() and created_by = auth.uid() and source = 'cliente' and status = 'solicitada' and (client_id is null or is_member(client_id)));
-drop policy if exists viewer_own on quotes;
-create policy viewer_own on quotes for select to authenticated
+alter policy viewer_own on quotes
   using (is_active() and (created_by = auth.uid() or (client_id is not null and is_member(client_id))));

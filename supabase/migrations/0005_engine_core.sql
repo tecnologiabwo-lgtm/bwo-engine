@@ -30,8 +30,7 @@ begin
   on conflict (id) do nothing;
   return new;
 end $$;
-drop trigger if exists on_auth_user_created on auth.users;
-create trigger on_auth_user_created after insert on auth.users
+create or replace trigger on_auth_user_created after insert on auth.users
   for each row execute function handle_new_user();
 
 create or replace function is_admin()
@@ -56,16 +55,19 @@ $$;
 -- ---------- Permisos del Feed Planner ----------
 -- Antes: cualquier usuario autenticado veía y editaba todo. Ahora: admin todo,
 -- espectador solo lectura de sus clientes (aprueba por las funciones con token).
+-- Sin DROP: la política abierta «agency_all» se renombra y se restringe a administradores.
 do $$
-declare t text; p record;
+declare t text;
 begin
   foreach t in array array['clients','pillars','posts','stories','highlights','corrections','post_events'] loop
     if to_regclass('public.'||t) is null then continue; end if;
-    for p in select policyname from pg_policies where schemaname='public' and tablename=t loop
-      execute format('drop policy %I on %I', p.policyname, t);
-    end loop;
     execute format('alter table %I enable row level security', t);
-    execute format('create policy admin_all on %I for all to authenticated using (is_admin()) with check (is_admin())', t);
+    if exists(select 1 from pg_policies where schemaname='public' and tablename=t and policyname='agency_all') then
+      execute format('alter policy agency_all on %I rename to admin_all', t);
+      execute format('alter policy admin_all on %I to authenticated using (is_admin()) with check (is_admin())', t);
+    elsif not exists(select 1 from pg_policies where schemaname='public' and tablename=t and policyname='admin_all') then
+      execute format('create policy admin_all on %I for all to authenticated using (is_admin()) with check (is_admin())', t);
+    end if;
   end loop;
 end $$;
 
@@ -127,7 +129,8 @@ create table if not exists price_catalog (
   description text,
   price       numeric(12,2) not null default 0,
   price_year  numeric(12,2),          -- precio anual (Clientify)
-  unit        text not null default 'unico' check (unit in ('unico','mes','hora','dia','sesion','pack')),
+  setup_price numeric(12,2),          -- Fase I / pago único de los programas
+  unit        text not null default 'unico' check (unit in ('unico','mes','hora','dia','sesion','pack','linea','usuario')),
   badge       text,
   color       text,
   features    jsonb not null default '[]',

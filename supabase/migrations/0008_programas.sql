@@ -7,8 +7,7 @@
 -- ============================================================
 alter table price_catalog add column if not exists setup_price numeric(12,2);
 
-alter table price_catalog drop constraint if exists price_catalog_unit_check;
-alter table price_catalog add constraint price_catalog_unit_check check (unit in ('unico','mes','hora','dia','sesion','pack','linea','usuario'));
+-- La restricción de unidades ya incluye 'linea' y 'usuario' desde 0005.
 
 update price_catalog set active = false
  where id in ('plan_turquoise','plan_cerise','plan_crayola','setup_social','crm_ads_monthly','crm_ads_setup');

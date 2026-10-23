@@ -17,7 +17,6 @@ create index if not exists idx_events_post on post_events(post_id, created_at);
 
 alter table post_events enable row level security;
 
-drop policy if exists agency_all on post_events;
 create policy agency_all on post_events
   for all to authenticated using (true) with check (true);
 -- El público (anon) no toca esta tabla: escribe solo por las funciones de abajo,
