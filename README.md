@@ -51,7 +51,7 @@ legacy/           HTML originales de referencia (calculadora, sala)
 
 ## Base de datos
 
-Aplicar en Supabase → SQL Editor, en orden: `0005_engine_core.sql`, `0006_price_seed.sql`, `0007_auth_registro.sql`, `0008_programas.sql`
+Aplicar en Supabase → SQL Editor, en orden: `0005_engine_core.sql`, `0006_price_seed.sql`, `0007_auth_registro.sql`, `0008_programas.sql`, `0009_programa_01.sql`
 (0003 y 0004 ya estaban aplicadas por el Feed Planner). Son aditivas: no borran datos.
 Los usuarios que ya existían quedan como `admin`; toda cuenta nueva nace como `viewer`.
 

@@ -5,6 +5,7 @@ import {esc,clip} from '../utils/format.js';
 import {shortDate,longDate,stamp} from '../utils/dates.js';
 import {profileHeader} from '../templates/profileHeader.js';
 import {gridCell,emptyCells} from '../templates/gridCell.js';
+import {paginate,pagerHTML} from '../templates/pager.js';
 import {timeline} from '../templates/timeline.js';
 import {openStories} from '../controllers/storyViewer.js';
 import {bindZoom,openZoom} from '../controllers/zoomView.js';
@@ -12,7 +13,7 @@ import * as Portal from '../services/clientPortal.js';
 
 const token=new URLSearchParams(location.search).get('token');
 let busy=false;
-const st={data:null,tab:'grid',selMode:false,selected:new Set(),idx:0,post:null};
+const st={data:null,tab:'grid',page:0,selMode:false,selected:new Set(),idx:0,post:null};
 const pillarOf=id=>(st.data.pillars||[]).find(p=>p.id===id)||{name:'—',color:'var(--text-faint)'};
 const canAct=p=>['pending','changes'].includes(p.status);
 const logo=()=>BRAND.logo?`<span class="brand-logo"><img src="${BRAND.logo}" alt=""></span>`:`<span class="brand-logo">${BRAND.initials}</span>`;
@@ -34,7 +35,8 @@ async function load(){
 }
 function render(){
   const c=st.data.client,posts=st.data.posts;
-  const list=st.tab==='reels'?posts.filter(p=>p.format==='reel'):posts;
+  const pg=paginate(st.tab==='reels'?posts.filter(p=>p.format==='reel'):posts,st.page);st.page=pg.page;
+  const list=pg.items;
   const min=st.tab==='reels'?3:9;
   const cells=list.map(p=>gridCell(p,{pillar:pillarOf(p.pillar_id),reelTab:st.tab==='reels',
     selectable:st.selMode&&canAct(p),selected:st.selected.has(p.id),locked:st.selMode&&!canAct(p)})).join('')
@@ -51,7 +53,7 @@ function render(){
       <div class="phone"><div class="phone-screen">
         ${profileHeader(c,{postCount:posts.length,stories:st.data.stories,highlights:st.data.highlights||[],
           onStories:'window.C.stories(0)',tab:st.tab,onTab:'window.C.tab'})}
-        <div class="ig-grid">${cells}</div></div></div>
+        <div class="ig-grid">${cells}</div>${pagerHTML(pg,'window.C.page')}</div></div>
       <div class="side">
         <section class="card"><h3>👋 ¿Cómo revisar?</h3>
           <p>Así se verá tu feed. Toca una publicación para ver el copy y las imágenes y <b>aprobarla</b> o <b>pedir cambios</b>. Con <b>Seleccionar varias</b> respondes en bloque.</p>
@@ -197,5 +199,5 @@ async function sendChanges(ids,text){
   }catch(e){toast('No se pudo enviar: '+e.message);}
   finally{busy=false;}
 }
-window.C={tab:t=>{st.tab=t;render();},stories:playStories};
+window.C={tab:t=>{st.tab=t;st.page=0;render();},page:n=>{st.page=n;render();},stories:playStories};
 load();

@@ -1,6 +1,8 @@
 /* Motor de cotización — función pura (sin React) para poder probarla.
  *
- * selection: { [itemId]: { qty, billing: "mes" | "anio" } }
+ * selection: { [itemId]: { qty, billing: "mes" | "anio", price?, setup? } }
+ *            price / setup: precio acordado en esta cotización (precio abierto);
+ *            si no vienen, se usa el del catálogo.
  * discounts: { setup, services, clientify } en % (0–100)
  * taxRate:   fracción (0.21 = 21 %). Se aplica a todo lo cotizado.
  *
@@ -17,6 +19,7 @@
 const r2 = (n) => Math.round((n + Number.EPSILON) * 100) / 100;
 const clampPct = (p) => Math.max(0, Math.min(100, Number(p) || 0)) / 100;
 const RECURRING = new Set(["mes", "linea", "usuario"]);
+const annualAllowed = (item, sel) => item.category === "clientify" && sel?.billing === "anio" && item.price_year != null;
 
 export function computeQuote(catalog, selection, discounts = {}, taxRate = 0) {
   const byId = new Map(catalog.map((i) => [i.id, i]));
@@ -26,19 +29,22 @@ export function computeQuote(catalog, selection, discounts = {}, taxRate = 0) {
     const qty = Math.max(0, Math.floor(Number(sel?.qty) || 0));
     if (!item || !qty) continue;
     const bucket = item.category === "setup" ? "setup" : item.category === "clientify" ? "clientify" : "services";
+    const num = (v) => (v === "" || v == null || !Number.isFinite(+v) ? null : Math.max(0, +v));
+    const setupPrice = num(sel.setup) ?? num(item.setup_price) ?? 0;
+    const basePrice = num(sel.price) ?? num(item.price) ?? 0;
     // Fase I del programa: pago único, se descuenta con «configuraciones iniciales»
-    if (Number(item.setup_price) > 0) {
-      lines.push({ id: `${id}:fase1`, itemId: id, name: `${item.name} · Fase I`, category: item.category, qty, unitPrice: +item.setup_price,
-        unit: "unico", kind: "unico", bucket: "setup", startsMonth: 1, gross: r2(item.setup_price * qty) });
+    if (setupPrice > 0) {
+      lines.push({ id: `${id}:fase1`, itemId: id, name: `${item.name} · Fase I`, category: item.category, qty, unitPrice: setupPrice,
+        unit: "unico", kind: "unico", bucket: "setup", startsMonth: 1, custom: num(sel.setup) != null, gross: r2(setupPrice * qty) });
     }
-    if (!(Number(item.price) > 0)) continue;
+    if (!(basePrice > 0) && !(annualAllowed(item, sel))) continue;
     const annual = item.category === "clientify" && sel.billing === "anio" && item.price_year != null;
     const recurring = !annual && (RECURRING.has(item.unit) || (item.unit === "hora" && item.meta?.recurring));
-    const unitPrice = annual ? item.price_year : item.price;
+    const unitPrice = annual ? (num(sel.price) ?? item.price_year) : basePrice;
     const kind = annual ? "anual" : recurring ? "mensual" : "unico";
     const startsMonth = recurring ? Math.max(1, Math.floor(item.meta?.starts_month || 1)) : 1;
-    lines.push({ id, itemId: id, name: item.setup_price > 0 ? `${item.name} · Fase II` : item.name, category: item.category, qty, unitPrice,
-      unit: annual ? "anio" : item.unit, kind, bucket, startsMonth, gross: r2(unitPrice * qty) });
+    lines.push({ id, itemId: id, name: setupPrice > 0 ? `${item.name} · Fase II` : item.name, category: item.category, qty, unitPrice,
+      unit: annual ? "anio" : item.unit, kind, bucket, startsMonth, custom: num(sel.price) != null, gross: r2(unitPrice * qty) });
   }
   const pct = { setup: clampPct(discounts.setup), services: clampPct(discounts.services), clientify: clampPct(discounts.clientify) };
   for (const l of lines) { l.discount = r2(l.gross * pct[l.bucket]); l.net = r2(l.gross - l.discount); }

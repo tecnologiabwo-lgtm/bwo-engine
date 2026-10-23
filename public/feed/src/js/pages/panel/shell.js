@@ -74,7 +74,7 @@ export function render(){
 }
 export async function selectClient(id){
   if(id==='__new'){renderClientSel();views.wizard();return;}
-  state.feedTab='grid';state.selMode=false;state.selected.clear();
+  state.feedTab='grid';state.feedPage=0;state.selMode=false;state.selected.clear();
   state.cc=await loadClient(id);renderNav();render();
 }
 export async function refresh(){

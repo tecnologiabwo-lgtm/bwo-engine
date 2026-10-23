@@ -30,4 +30,4 @@
 
 ## Migraciones
 
-Aplicar en orden: `0005_engine_core.sql`, `0006_price_seed.sql`, `0007_auth_registro.sql`, `0008_programas.sql`.
+Aplicar en orden: `0005_engine_core.sql`, `0006_price_seed.sql`, `0007_auth_registro.sql`, `0008_programas.sql`, `0009_programa_01.sql`.

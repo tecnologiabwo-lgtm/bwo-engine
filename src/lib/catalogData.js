@@ -22,7 +22,9 @@ const P = (id, name, description, setup, price, color, features, meta, sort, ext
   f(id, "program", name, description, price, "mes", { setup_price: setup, color, features, meta: { starts_month: 2, ...meta }, sort, ...extra });
 
 export const DEFAULT_CATALOG = [
-  P("prog_01", "Programa 01 · Presencia Digital B2B", "Contenido e imagen para Instagram y Facebook.", 0, 0, "#22D3C5", ["Precio pendiente de cargar"], { excludes: ["prog_02", "prog_03"], num: 1 }, 1, { active: false }),
+  P("prog_01", "Programa 01 · Presencia Digital B2B", "Contenido e imagen para Instagram y Facebook. Sin publicidad pagada ni CRM.", 300, 450, "#22D3C5",
+    ["16 publicaciones al mes: 8 imágenes/carruseles y 8 Reels", "Guiones, diseño, edición, textos y publicación", "Historias semanales", "Respuestas automáticas y envío de catálogo por palabra clave en Instagram", "Revisión de perfiles y control de comentarios", "Project Manager con control de calidad semanal"],
+    { excludes: ["prog_02", "prog_03"], num: 1 }, 1),
   P("prog_02", "Programa 02 · La Máquina de Facturación B2B", "Capte nuevos compradores y organice el seguimiento de sus ventas. Contenido, Meta Ads y CRM Clientify.", 450, 650, "#6C3BF5",
     ["16 piezas al mes: 8 imágenes/carruseles y 8 Reels con guion y edición", "Historias semanales", "Campañas de Meta Ads con formularios de precalificación", "1 usuario máster de Clientify con automatizaciones", "Hasta 8 horas de acompañamiento al mes", "Reporte mensual de publicidad y CRM · Project Manager"],
     { excludes: ["prog_01", "prog_03", "prog_04"], num: 2 }, 2, { badge: "EL MÁS COMPLETO EN META" }),

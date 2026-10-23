@@ -85,6 +85,16 @@ eq("descuento Fase I usa «configuraciones»", q.lines.find((l) => l.kind === "u
 eq("descuento Fase II usa «servicios»", q.lines.find((l) => l.kind === "mensual").net, 520);
 q = computeQuote(PROG, { p2: { qty: 1 } }, {}, 0.1);
 eq("impuesto en año 1", q.yearOne, (450 + 650 * 11) * 1.1);
+q = computeQuote(PROG, { p2: { qty: 1, setup: 400, price: 600 } });
+eq("precio abierto: Fase I acordada", q.firstTotal, 400);
+eq("precio abierto: Fase II acordada", q.monthlyTotal, 600);
+eq("precio abierto marcado", q.lines.every((l) => l.custom), true);
+q = computeQuote(PROG, { p2: { qty: 1, setup: "", price: null } });
+eq("precio abierto vacío usa catálogo", q.firstTotal, 450);
+q = computeQuote(PROG, { p2: { qty: 1, setup: -50 } });
+eq("precio abierto negativo se acota a 0", q.firstTotal, 0);
+q = computeQuote([{ id: "x", category: "program", price: 0, setup_price: 0, unit: "mes", meta: { starts_month: 2 } }], { x: { qty: 1, setup: 300, price: 450 } });
+eq("programa sin precio en catálogo, fijado en la cotización", [q.firstTotal, q.monthlyTotal], [300, 450]);
 s = toggleItem(PROG, {}, "p2", PCATS); s = toggleItem(PROG, s, "p3", PCATS);
 eq("programas excluyentes por meta.excludes", Object.keys(s), ["p3"]);
 s = toggleItem(PROG, s, "p5", PCATS);

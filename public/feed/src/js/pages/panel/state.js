@@ -6,7 +6,7 @@ import {daysAgo} from '../../utils/dates.js';
 
 export const state={clients:[],cc:null,view:'feed',theme:'dark',archive:[],
   calMonth:new Date().getFullYear()*12+new Date().getMonth(),
-  feedTab:'grid',selMode:false,selected:new Set(),error:null};
+  feedTab:'grid',feedPage:0,selMode:false,selected:new Set(),error:null};
 
 export const statusPatch=s=>{
   const patch={status:s};

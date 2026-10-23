@@ -6,6 +6,7 @@ import {STATUS,DIMS_REF} from '../../config/constants.js';
 import {CLIENT_VIEW_URL} from '../../config/env.js';
 import {profileHeader} from '../../templates/profileHeader.js';
 import {gridCell,emptyCells} from '../../templates/gridCell.js';
+import {paginate,pagerHTML} from '../../templates/pager.js';
 import {createSortable} from '../../controllers/dragSort.js';
 import {openStories} from '../../controllers/storyViewer.js';
 import * as Posts from '../../services/posts.js';
@@ -17,7 +18,9 @@ let destroySortable=null;
 function renderFeed(){
   const c=state.cc;
   const posts=sortedPosts(c);
-  const list=state.feedTab==='reels'?posts.filter(p=>p.format==='reel'):posts;
+  const all=state.feedTab==='reels'?posts.filter(p=>p.format==='reel'):posts;
+  const pg=paginate(all,state.feedPage);state.feedPage=pg.page;
+  const list=pg.items;
   const min=state.feedTab==='reels'?3:9;
   const cells=list.map(p=>gridCell(p,{
     pillar:pillarOf(c,p.pillar_id),reelTab:state.feedTab==='reels',
@@ -43,7 +46,7 @@ function renderFeed(){
       <div class="phone"><div class="phone-screen">
         ${profileHeader(c,{postCount:c.posts.length,stories:c.stories,highlights:c.highlights,
           onStories:'window.P.stories(0)',tab:state.feedTab,onTab:'window.P.tab'})}
-        <div class="ig-grid" id="igGrid">${cells}</div>
+        <div class="ig-grid" id="igGrid">${cells}</div>${pagerHTML(pg,'window.P.page')}
       </div></div>
       <div class="side-panel">
         ${drafts?`<div class="share-box warn"><p>👁‍🗨 <b>${drafts}</b> borrador${drafts>1?'es':''} que el cliente <b>no ve</b> todavía.</p>
@@ -99,8 +102,12 @@ function updateBulkBar(){
 }
 async function saveOrder(ids){
   try{
-    await Posts.setOrder(ids.map((id,i)=>[id,i]),new Map(state.cc.posts.map(p=>[p.id,p.sort])));
-    state.cc.posts.forEach(p=>{const i=ids.indexOf(p.id);if(i>=0)p.sort=i;});
+    // Solo se reordenó la página visible: se inserta ese tramo en el orden completo y se renumera
+    const full=sortedPosts(state.cc).map(p=>p.id);
+    const off=paginate(full,state.feedPage).offset;
+    const merged=[...full.slice(0,off),...ids,...full.slice(off+ids.length)];
+    await Posts.setOrder(merged.map((id,i)=>[id,i]),new Map(state.cc.posts.map(p=>[p.id,p.sort])));
+    state.cc.posts.forEach(p=>{const i=merged.indexOf(p.id);if(i>=0)p.sort=i;});
     toast('Orden actualizado ✓');
   }catch(e){toast('No se pudo guardar el orden: '+e.message);await refresh();}
 }
@@ -133,7 +140,8 @@ async function sendDrafts(){
     await refresh();toast('Enviado al cliente ✓');
   }catch(e){toast('Error: '+e.message);}
 }
-export function setTab(t){state.feedTab=t;render();}
+export function setTab(t){state.feedTab=t;state.feedPage=0;render();}
+export function setPage(n){state.feedPage=n;render();document.getElementById('igGrid')?.scrollIntoView({block:'nearest'});}
 export function playStories(i){
   const c=state.cc;openStories(c.stories,i,{handle:c.handle,photo:c.photo});
 }

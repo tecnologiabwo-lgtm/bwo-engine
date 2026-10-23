@@ -23,8 +23,9 @@ function Stepper({ value, onChange, max = 99 }) {
   );
 }
 
-function ItemCard({ item, sel, onToggle, onQty, onBilling, qtyMode }) {
+function ItemCard({ item, sel, onToggle, onQty, onBilling, qtyMode, canPrice, onPrice }) {
   const on = !!sel?.qty;
+  const open = !(Number(item.price) > 0) && !(Number(item.setup_price) > 0);
   return (
     <div className={cn("rounded-xl border p-4 transition", on ? "border-2 bg-white/10" : "border-white/10 bg-white/[0.03] hover:bg-white/[0.06]")}
       style={on ? { borderColor: item.color || "#6C3BF5" } : undefined}>
@@ -45,11 +46,25 @@ function ItemCard({ item, sel, onToggle, onQty, onBilling, qtyMode }) {
             <div className="text-lg font-black text-white">{money(item.setup_price)}<span className="ml-1 text-[11px] font-normal text-slate-400">pago único</span></div>
             <div className="mt-1 text-[10px] font-bold uppercase tracking-widest text-slate-400">Fase II{item.meta?.from_price ? " · desde" : ""}</div>
           </>) : null}
-          <div className="text-xl font-black" style={{ color: item.color || "#fff" }}>{money(sel?.billing === "anio" ? item.price_year : item.price)}</div>
+          <div className="text-xl font-black" style={{ color: item.color || "#fff" }}>{open ? "A definir" : money(sel?.billing === "anio" ? item.price_year : item.price)}</div>
           <div className="text-[11px] text-slate-400">{sel?.billing === "anio" ? "/ año (por adelantado)" : UNITS[item.unit]}{item.meta?.starts_month > 1 ? ` desde el mes ${item.meta.starts_month}` : ""}</div>
           {qtyMode && <div className="mt-2"><Stepper value={sel?.qty || 0} onChange={onQty} /></div>}
         </div>
       </div>
+      {canPrice && on && (
+        <div className="mt-3 flex flex-wrap items-end gap-3 rounded-lg bg-black/20 p-3 text-xs">
+          <span className="w-full text-[10px] font-bold uppercase tracking-widest text-bwo-amber">Precio acordado en esta cotización (vacío = catálogo)</span>
+          {(Number(item.setup_price) > 0 || item.category === "program") && (
+            <label className="flex flex-col gap-1 text-slate-300">Fase I · pago único
+              <input type="number" min="0" step="0.01" value={sel.setup ?? ""} placeholder={String(item.setup_price ?? 0)} onChange={(e) => onPrice("setup", e.target.value)}
+                className="w-32 rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 font-mono text-white outline-none focus:border-bwo-violet" /></label>
+          )}
+          <label className="flex flex-col gap-1 text-slate-300">{Number(item.setup_price) > 0 || item.category === "program" ? "Fase II · mensual" : `Precio ${UNITS[item.unit] || ""}`}
+            <input type="number" min="0" step="0.01" value={sel.price ?? ""} placeholder={String(item.price ?? 0)} onChange={(e) => onPrice("price", e.target.value)}
+              className="w-32 rounded-lg border border-white/10 bg-white/5 px-2 py-1.5 font-mono text-white outline-none focus:border-bwo-violet" /></label>
+          {(sel.setup != null || sel.price != null) && <button onClick={() => { onPrice("setup", null); onPrice("price", null); }} className="pb-1.5 text-bwo-violetLt">Volver al catálogo</button>}
+        </div>
+      )}
       {item.category === "clientify" && item.price_year != null && on && (
         <div className="mt-3 flex flex-wrap items-center gap-2 text-[11px]">
           {["mes", "anio"].map((b) => (
@@ -141,7 +156,7 @@ export default function CotizadorApp() {
   const { client } = useClient();
   const toast = useToast();
   const { items, settings, source } = useCatalog();
-  const catalog = useMemo(() => items.filter((i) => i.active !== false && (isAdmin || i.public !== false)), [items, isAdmin]);
+  const catalog = useMemo(() => items.filter((i) => i.active !== false && (isAdmin || (i.public !== false && (Number(i.price) > 0 || Number(i.setup_price) > 0)))), [items, isAdmin]);
   const [selection, setSelection] = useState({});
   const [disc, setDisc] = useState({ setup: 0, services: 0, clientify: 0 });
   const [contact, setContact] = useState({ name: "", company: "", email: "", phone: "", notes: "" });
@@ -159,6 +174,7 @@ export default function CotizadorApp() {
   const toggle = (id) => setSelection((s) => toggleItem(catalog, s, id, CATEGORIES));
   const setQty = (id, qty) => setSelection((s) => { const n = { ...s }; if (qty <= 0) delete n[id]; else n[id] = { billing: "mes", ...n[id], qty }; return n; });
   const setBilling = (id, billing) => setSelection((s) => ({ ...s, [id]: { ...s[id], billing } }));
+  const setPrice = (id, k, v) => setSelection((s) => { const cur = { ...s[id] }; if (v === "" || v == null) delete cur[k]; else cur[k] = Math.max(0, +v); return { ...s, [id]: cur }; });
 
   const text = () => {
     let t = `*PROPUESTA COMERCIAL | BIG WAY OFFICES*\n\nHola *${contact.name || "Estimado(a)"}*${contact.company ? ` (${contact.company})` : ""}, este es el resumen de inversión:\n\n`;
@@ -193,7 +209,14 @@ export default function CotizadorApp() {
   };
 
   const loadQuote = (r) => {
-    const s = {}; (r.lines || []).forEach((l) => { s[l.id] = { qty: l.qty, billing: l.kind === "anual" ? "anio" : "mes" }; });
+    const s = {};
+    (r.lines || []).forEach((l) => {
+      const id = l.itemId || l.id.replace(/:fase1$/, "");
+      const cur = s[id] || { qty: l.qty, billing: "mes" };
+      if (l.kind === "anual") cur.billing = "anio";
+      if (l.custom) { if (/:fase1$/.test(l.id)) cur.setup = l.unitPrice; else cur.price = l.unitPrice; }
+      s[id] = cur;
+    });
     setSelection(s); setContact({ name: "", company: "", email: "", phone: "", notes: "", ...(r.contact || {}) });
     setDisc({ setup: 0, services: 0, clientify: 0, ...(r.discounts || {}) }); setTab("armar");
   };
@@ -235,7 +258,8 @@ export default function CotizadorApp() {
                 <div className="grid gap-3">
                   {c.items.map((it) => (
                     <ItemCard key={it.id} item={it} sel={sel(it.id)} qtyMode={qtyMode(c)}
-                      onToggle={() => toggle(it.id)} onQty={(v) => setQty(it.id, v)} onBilling={(b) => setBilling(it.id, b)} />
+                      onToggle={() => toggle(it.id)} onQty={(v) => setQty(it.id, v)} onBilling={(b) => setBilling(it.id, b)}
+                      canPrice={isAdmin} onPrice={(k, v) => setPrice(it.id, k, v)} />
                   ))}
                 </div>
               </section>
