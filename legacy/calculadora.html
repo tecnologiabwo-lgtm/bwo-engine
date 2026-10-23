@@ -1,0 +1,1093 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Calculadora CRM BigWay</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+  /* Layout concept: dark navy workspace with three calculator panels stacked under a sticky results strip; inputs on a cool grid, outputs in oversized tabular numerals that read across a room during a demo. */
+  :root {
+    --bg: #F6F4EE;
+    --surface: #FFFFFF;
+    --surface-sunk: #ECEAE1;
+    --ink: #0E1430;
+    --ink-soft: #4A5272;
+    --ink-mute: #8690AC;
+    --rule: #D9D5C7;
+    --accent: #FF5B49;
+    --accent-ink: #FFFFFF;
+    --teal: #0E8F84;
+    --indigo: #3B40C9;
+    --amber: #C78B1E;
+    --focus: #FF5B49;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0C122B;
+      --surface: #161E42;
+      --surface-sunk: #0F1636;
+      --ink: #F3F1EA;
+      --ink-soft: #B7BED6;
+      --ink-mute: #7A82A3;
+      --rule: #2A3360;
+      --accent: #FF6B5B;
+      --accent-ink: #0C122B;
+      --teal: #4FD5CC;
+      --indigo: #8E95FF;
+      --amber: #F2B65C;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0C122B;
+    --surface: #161E42;
+    --surface-sunk: #0F1636;
+    --ink: #F3F1EA;
+    --ink-soft: #B7BED6;
+    --ink-mute: #7A82A3;
+    --rule: #2A3360;
+    --accent: #FF6B5B;
+    --accent-ink: #0C122B;
+    --teal: #4FD5CC;
+    --indigo: #8E95FF;
+    --amber: #F2B65C;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, Segoe UI, sans-serif;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--ink);
+    background: var(--bg);
+    -webkit-font-smoothing: antialiased;
+  }
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 24px 20px 80px;
+  }
+
+  /* Masthead */
+  .mast {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 24px;
+    padding: 10px 0 22px;
+    border-bottom: 1px solid var(--rule);
+    flex-wrap: wrap;
+  }
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+  .brand .mark {
+    width: 10px; height: 10px; border-radius: 2px;
+    background: var(--accent);
+    display: inline-block; transform: translateY(1px);
+  }
+  .brand .name { font-size: 15px; }
+  .brand .div { color: var(--ink-mute); font-weight: 500; }
+  .brand .doc { font-size: 15px; color: var(--ink-soft); font-weight: 500; }
+  .mast-tools {
+    display: flex; gap: 8px; align-items: center;
+    font-size: 12px; color: var(--ink-mute);
+  }
+  .theme-btn {
+    background: none; border: 1px solid var(--rule); color: var(--ink-soft);
+    padding: 5px 10px; border-radius: 999px; cursor: pointer;
+    font: inherit; font-size: 12px;
+  }
+  .theme-btn:hover { color: var(--ink); border-color: var(--ink-soft); }
+
+  /* Hero / summary */
+  .hero {
+    padding: 36px 0 28px;
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    gap: 48px;
+    align-items: end;
+  }
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    font-size: clamp(34px, 5vw, 54px);
+    line-height: 1.02;
+    margin: 0 0 14px;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+  .hero h1 em { font-style: normal; color: var(--accent); }
+  .hero p {
+    margin: 0;
+    color: var(--ink-soft);
+    font-size: 16px;
+    max-width: 48ch;
+  }
+  .summary {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    padding: 22px 24px;
+  }
+  .summary h2 {
+    margin: 0 0 14px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+  }
+  .summary dl {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px 20px;
+    margin: 0;
+  }
+  .summary div { min-width: 0; }
+  .summary dt {
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .summary dd {
+    margin: 0;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+  }
+  .summary dd .unit {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-mute);
+    margin-left: 4px;
+  }
+  .summary dd.good { color: var(--teal); }
+  .summary dd.warn { color: var(--amber); }
+  .summary dd.alert { color: var(--accent); }
+
+  /* Tab bar */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    margin: 40px 0 0;
+    border-bottom: 1px solid var(--rule);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tab {
+    appearance: none;
+    background: none;
+    border: 0;
+    padding: 14px 20px 14px 0;
+    margin-right: 26px;
+    font: inherit;
+    font-weight: 600;
+    color: var(--ink-mute);
+    cursor: pointer;
+    position: relative;
+    white-space: nowrap;
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    letter-spacing: -0.005em;
+  }
+  .tab .n {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px;
+    color: var(--ink-mute);
+    font-weight: 500;
+  }
+  .tab:hover { color: var(--ink-soft); }
+  .tab[aria-selected="true"] { color: var(--ink); }
+  .tab[aria-selected="true"]::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 26px; bottom: -1px;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  /* Panels */
+  .panel { display: none; padding-top: 32px; }
+  .panel.on { display: block; }
+  .panel-head {
+    display: flex;
+    gap: 14px;
+    align-items: baseline;
+    margin: 0 0 6px;
+  }
+  .panel-head h2 {
+    margin: 0;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+  .panel-head .lesson {
+    font-size: 12px;
+    color: var(--ink-mute);
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    font-weight: 600;
+  }
+  .panel-intro {
+    color: var(--ink-soft);
+    margin: 0 0 28px;
+    max-width: 72ch;
+    font-size: 15px;
+  }
+
+  /* Two-column calc layout */
+  .calc {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr);
+    gap: 28px;
+    align-items: stretch;
+  }
+  .inputs, .outputs {
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-radius: 14px;
+    padding: 24px 24px 22px;
+    min-width: 0;
+  }
+  .inputs h3, .outputs h3 {
+    margin: 0 0 18px;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    display: flex; justify-content: space-between; align-items: baseline;
+  }
+  .inputs h3 .assist { font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--ink-mute); font-size: 12px; }
+
+  .field {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 8px 14px;
+    align-items: center;
+    padding: 11px 0;
+    border-bottom: 1px dashed var(--rule);
+  }
+  .field:last-child { border-bottom: 0; padding-bottom: 2px; }
+  .field label {
+    font-size: 14px;
+    color: var(--ink);
+    font-weight: 500;
+    min-width: 0;
+  }
+  .field small {
+    display: block;
+    font-weight: 400;
+    color: var(--ink-mute);
+    font-size: 12px;
+    margin-top: 2px;
+  }
+  .input {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface-sunk);
+    border: 1px solid var(--rule);
+    border-radius: 8px;
+    padding: 0 10px;
+    transition: border-color .15s;
+  }
+  .input:focus-within {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent);
+  }
+  .input input, .input select {
+    appearance: none;
+    background: none;
+    border: 0;
+    outline: 0;
+    padding: 9px 0;
+    font: inherit;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--ink);
+    text-align: right;
+    width: 7ch;
+    font-variant-numeric: tabular-nums;
+  }
+  .input input::-webkit-outer-spin-button,
+  .input input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .input input[type=number] { -moz-appearance: textfield; }
+  .input select { font-family: 'Inter', sans-serif; font-weight: 500; width: auto; padding-right: 4px; }
+  .input .suffix { font-size: 12px; color: var(--ink-mute); font-weight: 500; }
+  .input input.wide { width: 10ch; }
+
+  /* Output rows */
+  .out-row {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 14px;
+    align-items: baseline;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .out-row:last-child { border-bottom: 0; padding-bottom: 2px; }
+  .out-row .k { font-size: 13px; color: var(--ink-soft); font-weight: 500; }
+  .out-row .k small { display: block; color: var(--ink-mute); font-size: 11px; margin-top: 2px; font-weight: 400; }
+  .out-row .v {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: -0.015em;
+    color: var(--ink);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
+  .out-row .v .unit { font-size: 12px; color: var(--ink-mute); font-weight: 500; margin-left: 4px; }
+  .out-row.head {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 600;
+    padding: 0 0 10px;
+  }
+  .out-row.head .v { font-family: inherit; font-size: 11px; font-weight: 600; letter-spacing: 0.14em; }
+  .out-row.big .v { font-size: 32px; color: var(--accent); }
+  .out-row.calm .v { color: var(--teal); }
+
+  /* Funnel visualisation */
+  .funnel {
+    margin: 20px 0 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .fstage {
+    display: grid;
+    grid-template-columns: 110px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    font-size: 13px;
+  }
+  .fstage .lab { color: var(--ink-soft); font-weight: 500; }
+  .fstage .bar-track {
+    height: 26px;
+    background: var(--surface-sunk);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    min-width: 0;
+  }
+  .fstage .bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--teal), var(--indigo));
+    transition: width .4s ease;
+    border-radius: 6px;
+  }
+  .fstage .num {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    font-size: 15px;
+    min-width: 60px;
+    text-align: right;
+  }
+  .fstage.last .bar { background: var(--accent); }
+
+  /* Scenarios table */
+  .scenarios {
+    margin-top: 20px;
+    border-top: 1px solid var(--rule);
+    padding-top: 18px;
+  }
+  .scenarios h4 {
+    margin: 0 0 8px;
+    font-size: 12px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-mute);
+    font-weight: 600;
+  }
+  .scenario-tbl {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    gap: 6px 14px;
+    font-size: 13px;
+  }
+  .scenario-tbl .sh {
+    font-size: 11px;
+    color: var(--ink-mute);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    font-weight: 600;
+    padding: 4px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+  .scenario-tbl .sh:not(:first-child) { text-align: right; }
+  .scenario-tbl .sc { color: var(--ink-soft); padding: 6px 0; }
+  .scenario-tbl .sv {
+    padding: 6px 0;
+    text-align: right;
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    color: var(--ink);
+  }
+  .scenario-tbl .delta-pos { color: var(--teal); }
+
+  /* Chips row (presets) */
+  .chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin: 0 0 14px;
+  }
+  .chip {
+    appearance: none;
+    background: var(--surface-sunk);
+    border: 1px solid var(--rule);
+    border-radius: 999px;
+    padding: 5px 11px;
+    font: inherit;
+    font-size: 12px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    font-weight: 500;
+  }
+  .chip:hover { border-color: var(--ink-soft); color: var(--ink); }
+  .chip[aria-pressed="true"] {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--accent-ink);
+  }
+
+  /* Note at bottom of each panel */
+  .note {
+    margin-top: 24px;
+    padding: 16px 18px;
+    background: var(--surface);
+    border: 1px solid var(--rule);
+    border-left: 3px solid var(--teal);
+    border-radius: 10px;
+    color: var(--ink-soft);
+    font-size: 13.5px;
+    line-height: 1.55;
+  }
+  .note strong { color: var(--ink); font-weight: 600; }
+
+  /* Footer */
+  .foot {
+    margin-top: 56px;
+    padding-top: 24px;
+    border-top: 1px solid var(--rule);
+    display: flex;
+    justify-content: space-between;
+    gap: 18px;
+    flex-wrap: wrap;
+    font-size: 12px;
+    color: var(--ink-mute);
+  }
+  .foot a { color: var(--ink-soft); text-decoration: none; border-bottom: 1px dotted currentColor; }
+
+  /* Mobile */
+  @media (max-width: 820px) {
+    .hero { grid-template-columns: 1fr; gap: 28px; }
+    .calc { grid-template-columns: 1fr; }
+    .summary dl { grid-template-columns: 1fr 1fr; }
+    .scenario-tbl { font-size: 12px; }
+    .fstage { grid-template-columns: 90px 1fr auto; }
+  }
+  @media (max-width: 480px) {
+    .wrap { padding: 16px 16px 60px; }
+    .hero { padding: 20px 0; }
+    .summary dl { grid-template-columns: 1fr; gap: 10px; }
+    .summary dd { font-size: 20px; }
+    .field { grid-template-columns: 1fr; gap: 6px; }
+    .input input { width: 100%; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { animation: none !important; transition: none !important; }
+  }
+</style>
+
+<div class="wrap">
+  <header class="mast">
+    <div class="brand">
+      <span class="mark" aria-hidden="true"></span>
+      <span class="name">Big Way Offices</span>
+      <span class="div">·</span>
+      <span class="doc">Academia Clientify · Calculadora</span>
+    </div>
+    <div class="mast-tools">
+      <button class="theme-btn" type="button" id="themeBtn" aria-label="Cambiar tema">Tema</button>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <h1>El CRM se paga <em>solo</em>. Vamos a demostrarlo con tus números.</h1>
+      <p>Tres calculadoras para la Academia BigWay: ahorro por automatización, embudo de ventas y recuperación de la inversión. Cámbialas en vivo durante la clase o la sesión de diagnóstico.</p>
+    </div>
+    <aside class="summary" aria-label="Resumen general">
+      <h2>Resumen de esta sesión</h2>
+      <dl>
+        <div>
+          <dt>Ahorro mensual</dt>
+          <dd class="good" id="sum-ahorro">—</dd>
+        </div>
+        <div>
+          <dt>Ventas con mejoras</dt>
+          <dd class="alert" id="sum-ventas">—</dd>
+        </div>
+        <div>
+          <dt>Beneficio mensual neto</dt>
+          <dd id="sum-beneficio">—</dd>
+        </div>
+        <div>
+          <dt>Recuperación</dt>
+          <dd class="warn" id="sum-payback">—</dd>
+        </div>
+      </dl>
+    </aside>
+  </section>
+
+  <nav class="tabs" role="tablist" aria-label="Calculadoras">
+    <button class="tab" role="tab" aria-selected="true" aria-controls="p1" id="t1"><span class="n">01</span> Ahorro por automatización</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p2" id="t2"><span class="n">02</span> Simulador de embudo</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p3" id="t3"><span class="n">03</span> ROI y recuperación</button>
+  </nav>
+
+  <!-- PANEL 1: AHORRO POR AUTOMATIZACIÓN -->
+  <section class="panel on" role="tabpanel" id="p1" aria-labelledby="t1">
+    <div class="panel-head">
+      <h2>Lo que ahorras cuando el CRM trabaja por ti</h2>
+      <span class="lesson">Clase 4 · Chatbot y Clase 8 · Automatizaciones</span>
+    </div>
+    <p class="panel-intro">Cada acción que antes se hacía a mano (saludo, calificación, recordatorio, nota) tiene un costo en minutos y dinero. Carga lo que tus automatizaciones ejecutaron en el período y mira cuánto trabajo evitaste.</p>
+
+    <div class="calc">
+      <div class="inputs">
+        <h3>Supuestos <span class="assist">cámbialos con el cliente</span></h3>
+
+        <div class="chips" role="group" aria-label="Escenarios rápidos">
+          <button class="chip" type="button" data-preset="demo">Ejemplo captura (50 acc.)</button>
+          <button class="chip" type="button" data-preset="pyme">Pyme, 1 mes</button>
+          <button class="chip" type="button" data-preset="agencia">Agencia, 1 mes</button>
+        </div>
+
+        <div class="field">
+          <label>Acciones automatizadas <small>bot + automatizaciones + plantillas</small></label>
+          <span class="input"><input type="number" id="a-actions" value="1500" min="0" step="10" class="wide"></span>
+        </div>
+        <div class="field">
+          <label>Minutos por acción manual <small>pregunta frecuente, calificar, agendar</small></label>
+          <span class="input"><input type="number" id="a-minutes" value="2" min="0" step="0.5"><span class="suffix">min</span></span>
+        </div>
+        <div class="field">
+          <label>Moneda</label>
+          <span class="input"><select id="a-currency">
+            <option value="USD">USD</option>
+            <option value="EUR" selected>EUR</option>
+            <option value="VES">Bs</option>
+            <option value="MXN">MXN</option>
+            <option value="COP">COP</option>
+          </select></span>
+        </div>
+        <div class="field">
+          <label>Salario bruto anual <small>de quien atendería manualmente</small></label>
+          <span class="input"><input type="number" id="a-salary" value="18000" min="0" step="500" class="wide"><span class="suffix" id="a-salary-cur">€</span></span>
+        </div>
+        <div class="field">
+          <label>Jornada semanal <small>horas por semana</small></label>
+          <span class="input"><input type="number" id="a-week" value="40" min="1" step="1"><span class="suffix">h/sem</span></span>
+        </div>
+      </div>
+
+      <div class="outputs">
+        <h3>Resultado <span class="assist">se actualiza en vivo</span></h3>
+        <div class="out-row big calm">
+          <div class="k">Ahorro en este período<small>horas evitadas × costo por hora</small></div>
+          <div class="v" id="a-save"><span class="unit">—</span></div>
+        </div>
+        <div class="out-row">
+          <div class="k">Horas evitadas</div>
+          <div class="v" id="a-hours">— <span class="unit">h</span></div>
+        </div>
+        <div class="out-row">
+          <div class="k">Jornadas completas<small>a 8 h por día</small></div>
+          <div class="v" id="a-days">— <span class="unit">días</span></div>
+        </div>
+        <div class="out-row">
+          <div class="k">Equivale a<small>meses laborales de un empleado</small></div>
+          <div class="v" id="a-months">— <span class="unit">meses</span></div>
+        </div>
+        <div class="out-row">
+          <div class="k">Costo por hora<small>salario ÷ (horas/sem × 52)</small></div>
+          <div class="v" id="a-rate">— <span class="unit"></span></div>
+        </div>
+
+        <div class="scenarios">
+          <h4>Proyección a 12 meses</h4>
+          <div class="scenario-tbl" aria-label="Proyección">
+            <div class="sh">Escenario</div><div class="sh">Horas</div><div class="sh">Ahorro</div><div class="sh">Jornadas</div>
+            <div class="sc">Mes actual</div><div class="sv" id="a-m1-h">—</div><div class="sv" id="a-m1-s">—</div><div class="sv" id="a-m1-d">—</div>
+            <div class="sc">Trimestre</div><div class="sv" id="a-m3-h">—</div><div class="sv" id="a-m3-s">—</div><div class="sv" id="a-m3-d">—</div>
+            <div class="sc">Año</div><div class="sv delta-pos" id="a-m12-h">—</div><div class="sv delta-pos" id="a-m12-s">—</div><div class="sv delta-pos" id="a-m12-d">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Cómo usarlo en clase.</strong> Toma el dashboard de rendimiento de automatizaciones del cliente, carga las acciones ejecutadas del mes y proyecta a 12 meses. El ahorro real no es el de una automatización, sino el del sistema completo: bot + plantillas + flujos de ventas.
+    </div>
+  </section>
+
+  <!-- PANEL 2: SIMULADOR DE EMBUDO -->
+  <section class="panel" role="tabpanel" id="p2" aria-labelledby="t2" hidden>
+    <div class="panel-head">
+      <h2>Dónde se pierden las ventas y cuánto vale arreglarlo</h2>
+      <span class="lesson">Clase 5 · Venta consultiva · Clase 6 · Pipeline</span>
+    </div>
+    <p class="panel-intro">Rapidez al responder es solo la entrada. Mide todo el embudo y compara el escenario actual con uno mejorado para decidir qué etapa atacar primero.</p>
+
+    <div class="calc">
+      <div class="inputs">
+        <h3>Supuestos del embudo <span class="assist">base vs mejorado</span></h3>
+
+        <div class="field">
+          <label>Prospectos recibidos <small>mensuales</small></label>
+          <span class="input"><input type="number" id="f-leads" value="1000" min="0" step="10" class="wide"></span>
+        </div>
+        <div class="field">
+          <label>Ticket promedio <small>por venta ganada</small></label>
+          <span class="input"><input type="number" id="f-ticket" value="500" min="0" step="10" class="wide"><span class="suffix" id="f-ticket-cur">€</span></span>
+        </div>
+
+        <div class="out-row head" style="grid-template-columns:1fr auto auto;gap:14px;"><div class="k">Tasas</div><div class="v" style="text-align:right">Base</div><div class="v" style="text-align:right">Mejorado</div></div>
+
+        <div class="field" style="grid-template-columns:1fr auto auto;gap:14px;">
+          <label>Respondidos <small>del total de prospectos</small></label>
+          <span class="input"><input type="number" id="f-r-base" value="80" min="0" max="100" step="1"><span class="suffix">%</span></span>
+          <span class="input"><input type="number" id="f-r-up" value="95" min="0" max="100" step="1"><span class="suffix">%</span></span>
+        </div>
+        <div class="field" style="grid-template-columns:1fr auto auto;gap:14px;">
+          <label>Calificados <small>sobre respondidos</small></label>
+          <span class="input"><input type="number" id="f-q-base" value="50" min="0" max="100" step="1"><span class="suffix">%</span></span>
+          <span class="input"><input type="number" id="f-q-up" value="60" min="0" max="100" step="1"><span class="suffix">%</span></span>
+        </div>
+        <div class="field" style="grid-template-columns:1fr auto auto;gap:14px;">
+          <label>Ganados <small>sobre calificados</small></label>
+          <span class="input"><input type="number" id="f-w-base" value="30" min="0" max="100" step="1"><span class="suffix">%</span></span>
+          <span class="input"><input type="number" id="f-w-up" value="35" min="0" max="100" step="1"><span class="suffix">%</span></span>
+        </div>
+      </div>
+
+      <div class="outputs">
+        <h3>Embudo mejorado <span class="assist">lo que verá el cliente</span></h3>
+
+        <div class="funnel" id="funnel-up" aria-label="Embudo mejorado"></div>
+
+        <div class="out-row big">
+          <div class="k">Ingresos adicionales / mes<small>mejorado − base</small></div>
+          <div class="v" id="f-delta-rev">—</div>
+        </div>
+        <div class="out-row">
+          <div class="k">Ventas adicionales / mes</div>
+          <div class="v" id="f-delta-sales">— <span class="unit">ventas</span></div>
+        </div>
+        <div class="out-row">
+          <div class="k">Conversión total</div>
+          <div class="v"><span id="f-conv-base">—</span> → <span id="f-conv-up" style="color:var(--teal)">—</span> <span class="unit">%</span></div>
+        </div>
+
+        <div class="scenarios">
+          <h4>Comparación por etapa</h4>
+          <div class="scenario-tbl">
+            <div class="sh">Etapa</div><div class="sh">Base</div><div class="sh">Mejorado</div><div class="sh">+</div>
+            <div class="sc">Respondidos</div><div class="sv" id="f-s-r-b">—</div><div class="sv" id="f-s-r-u">—</div><div class="sv delta-pos" id="f-s-r-d">—</div>
+            <div class="sc">Calificados</div><div class="sv" id="f-s-q-b">—</div><div class="sv" id="f-s-q-u">—</div><div class="sv delta-pos" id="f-s-q-d">—</div>
+            <div class="sc">Ganados</div><div class="sv" id="f-s-w-b">—</div><div class="sv" id="f-s-w-u">—</div><div class="sv delta-pos" id="f-s-w-d">—</div>
+            <div class="sc">Ingresos</div><div class="sv" id="f-s-rev-b">—</div><div class="sv" id="f-s-rev-u">—</div><div class="sv delta-pos" id="f-s-rev-d">—</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Cómo usarlo en clase.</strong> Pide al cliente los números reales de un trimestre: cuántos prospectos entraron por formularios e Inbox, cuántos respondieron y cuántos cerraron. El ejercicio del Curso 5 es decidir qué etapa atacar primero: responder más (bot e Inbox), calificar mejor (BANT, PACT, MEDDIC) o cerrar más (seguimiento y objeciones).
+    </div>
+  </section>
+
+  <!-- PANEL 3: ROI Y RECUPERACIÓN -->
+  <section class="panel" role="tabpanel" id="p3" aria-labelledby="t3" hidden>
+    <div class="panel-head">
+      <h2>Cuánto tarda en pagarse la inversión</h2>
+      <span class="lesson">Diagnóstico comercial · Cierre de Fases 3 y 5</span>
+    </div>
+    <p class="panel-intro">Suma la inversión inicial y los costos recurrentes; resta el ahorro de tiempo y las ventas incrementales. Lo que queda es el beneficio mensual y los meses para recuperar.</p>
+
+    <div class="calc">
+      <div class="inputs">
+        <h3>Inversión y beneficio <span class="assist">valores de ejemplo del documento</span></h3>
+
+        <div class="field">
+          <label>Moneda</label>
+          <span class="input"><select id="r-currency">
+            <option value="USD" selected>USD</option>
+            <option value="EUR">EUR</option>
+            <option value="VES">Bs</option>
+            <option value="MXN">MXN</option>
+            <option value="COP">COP</option>
+          </select></span>
+        </div>
+        <div class="field">
+          <label>Inversión inicial <small>implementación BigWay</small></label>
+          <span class="input"><input type="number" id="r-setup" value="1500" min="0" step="50" class="wide"></span>
+        </div>
+        <div class="field">
+          <label>Costo mensual <small>licencia Clientify + Meta + IA</small></label>
+          <span class="input"><input type="number" id="r-monthly" value="100" min="0" step="10" class="wide"></span>
+        </div>
+        <div class="field">
+          <label>Ahorro mensual de tiempo <small>viene de la Pestaña 1 convertida</small></label>
+          <span class="input"><input type="number" id="r-save" value="400" min="0" step="10" class="wide"></span>
+        </div>
+        <div class="field">
+          <label>Ventas incrementales / mes <small>las del embudo mejorado</small></label>
+          <span class="input"><input type="number" id="r-sales" value="5" min="0" step="1"></span>
+        </div>
+        <div class="field">
+          <label>Ticket promedio</label>
+          <span class="input"><input type="number" id="r-ticket" value="500" min="0" step="10" class="wide"></span>
+        </div>
+        <div class="field">
+          <label>Margen bruto <small>sobre cada venta nueva</small></label>
+          <span class="input"><input type="number" id="r-margin" value="30" min="0" max="100" step="1"><span class="suffix">%</span></span>
+        </div>
+      </div>
+
+      <div class="outputs">
+        <h3>Resultado <span class="assist">supuestos conservadores</span></h3>
+
+        <div class="out-row big calm">
+          <div class="k">Beneficio mensual neto<small>ahorro + ventas × margen − costo mensual</small></div>
+          <div class="v" id="r-benefit">—</div>
+        </div>
+        <div class="out-row">
+          <div class="k">Ahorro de tiempo</div>
+          <div class="v" id="r-ahorro">—</div>
+        </div>
+        <div class="out-row">
+          <div class="k">Margen de ventas nuevas<small>ventas × ticket × margen</small></div>
+          <div class="v" id="r-marginval">—</div>
+        </div>
+        <div class="out-row">
+          <div class="k">Costo mensual</div>
+          <div class="v" id="r-costm">—</div>
+        </div>
+        <div class="out-row big" style="margin-top:4px">
+          <div class="k">Meses para recuperar<small>inversión ÷ beneficio mensual</small></div>
+          <div class="v" id="r-payback"><span class="unit">meses</span></div>
+        </div>
+        <div class="out-row">
+          <div class="k">ROI primer año<small>(12 × beneficio − inversión) ÷ inversión total</small></div>
+          <div class="v" id="r-roi">— <span class="unit">%</span></div>
+        </div>
+        <div class="out-row">
+          <div class="k">Beneficio a 12 meses</div>
+          <div class="v" id="r-year">—</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      <strong>Cómo usarlo en clase.</strong> En el diagnóstico se llena con supuestos conservadores. Al cierre de las Fases 3 y 5 se vuelve a llenar con los datos reales de Clientify: el ahorro desde el dashboard de automatizaciones y las ventas incrementales desde el pipeline. Ese contraste es la mejor presentación de resultados ante dirección.
+    </div>
+  </section>
+
+  <footer class="foot">
+    <div>Academia BigWay · Ruta de implementación Clientify · <span id="today"></span></div>
+    <div>Cifras ilustrativas; cada cliente debe recalcular con sus propios datos.</div>
+  </footer>
+</div>
+
+<script>
+(() => {
+  // --- Theme toggle ---
+  const themeBtn = document.getElementById('themeBtn');
+  try {
+    const saved = localStorage.getItem('bw-theme');
+    if (saved === 'dark' || saved === 'light') {
+      document.documentElement.setAttribute('data-theme', saved);
+    }
+  } catch (e) {}
+  themeBtn.addEventListener('click', () => {
+    const cur = document.documentElement.getAttribute('data-theme');
+    const prefersDark = matchMedia('(prefers-color-scheme: dark)').matches;
+    const next = cur === 'dark' ? 'light' : cur === 'light' ? (prefersDark ? 'dark' : 'light') : (prefersDark ? 'light' : 'dark');
+    document.documentElement.setAttribute('data-theme', next);
+    try { localStorage.setItem('bw-theme', next); } catch (e) {}
+  });
+
+  // --- Tabs ---
+  const tabs = document.querySelectorAll('.tab');
+  const panels = document.querySelectorAll('.panel');
+  tabs.forEach(t => t.addEventListener('click', () => {
+    tabs.forEach(x => x.setAttribute('aria-selected', 'false'));
+    panels.forEach(p => { p.classList.remove('on'); p.hidden = true; });
+    t.setAttribute('aria-selected', 'true');
+    const p = document.getElementById(t.getAttribute('aria-controls'));
+    p.classList.add('on'); p.hidden = false;
+  }));
+
+  // --- Currency formatting ---
+  const currencySymbols = { USD: '$', EUR: '€', VES: 'Bs', MXN: '$', COP: '$' };
+  const currencyLocale = { USD: 'en-US', EUR: 'es-ES', VES: 'es-VE', MXN: 'es-MX', COP: 'es-CO' };
+  const fmtNum = (n, decimals = 0) => {
+    if (!isFinite(n)) return '—';
+    return new Intl.NumberFormat('es-ES', { minimumFractionDigits: decimals, maximumFractionDigits: decimals }).format(n);
+  };
+  const fmtMoney = (n, cur) => {
+    if (!isFinite(n)) return '—';
+    const sym = currencySymbols[cur] || cur;
+    const val = Math.abs(n) >= 1000 ? fmtNum(Math.round(n)) : fmtNum(n, 0);
+    return `${val} ${sym}`;
+  };
+
+  // --- Panel 1: automation savings ---
+  const a = {
+    actions: document.getElementById('a-actions'),
+    minutes: document.getElementById('a-minutes'),
+    currency: document.getElementById('a-currency'),
+    salary: document.getElementById('a-salary'),
+    week: document.getElementById('a-week'),
+    out: {
+      save: document.getElementById('a-save'),
+      hours: document.getElementById('a-hours'),
+      days: document.getElementById('a-days'),
+      months: document.getElementById('a-months'),
+      rate: document.getElementById('a-rate'),
+      m1h: document.getElementById('a-m1-h'), m1s: document.getElementById('a-m1-s'), m1d: document.getElementById('a-m1-d'),
+      m3h: document.getElementById('a-m3-h'), m3s: document.getElementById('a-m3-s'), m3d: document.getElementById('a-m3-d'),
+      m12h: document.getElementById('a-m12-h'), m12s: document.getElementById('a-m12-s'), m12d: document.getElementById('a-m12-d'),
+    },
+    cur: document.getElementById('a-salary-cur'),
+  };
+  const presets = {
+    demo:    { actions: 50,   minutes: 2, salary: 18000, currency: 'EUR' },
+    pyme:    { actions: 1500, minutes: 2, salary: 18000, currency: 'EUR' },
+    agencia: { actions: 6000, minutes: 3, salary: 24000, currency: 'EUR' },
+  };
+  document.querySelectorAll('.chip').forEach(c => c.addEventListener('click', () => {
+    document.querySelectorAll('.chip').forEach(x => x.setAttribute('aria-pressed', 'false'));
+    c.setAttribute('aria-pressed', 'true');
+    const p = presets[c.dataset.preset];
+    if (!p) return;
+    a.actions.value = p.actions;
+    a.minutes.value = p.minutes;
+    a.salary.value = p.salary;
+    a.currency.value = p.currency;
+    calcAll();
+  }));
+
+  function calcAutomation() {
+    const actions = +a.actions.value || 0;
+    const minutes = +a.minutes.value || 0;
+    const salary = +a.salary.value || 0;
+    const weekly = +a.week.value || 40;
+    const cur = a.currency.value;
+
+    const hoursSaved = (actions * minutes) / 60;
+    const costPerHour = salary / (weekly * 52);
+    const savings = hoursSaved * costPerHour;
+    const days = hoursSaved / 8;
+    const months = hoursSaved / (weekly * 52 / 12);
+
+    a.cur.textContent = currencySymbols[cur] || cur;
+    a.out.save.innerHTML = `${fmtMoney(savings, cur)}`;
+    a.out.hours.innerHTML = `${fmtNum(hoursSaved, 1)} <span class="unit">h</span>`;
+    a.out.days.innerHTML = `${fmtNum(days, 1)} <span class="unit">días</span>`;
+    a.out.months.innerHTML = `${fmtNum(months, 2)} <span class="unit">meses</span>`;
+    a.out.rate.innerHTML = `${fmtMoney(costPerHour, cur)} <span class="unit">/h</span>`;
+
+    a.out.m1h.textContent = fmtNum(hoursSaved, 0) + ' h';
+    a.out.m1s.textContent = fmtMoney(savings, cur);
+    a.out.m1d.textContent = fmtNum(days, 1);
+    a.out.m3h.textContent = fmtNum(hoursSaved * 3, 0) + ' h';
+    a.out.m3s.textContent = fmtMoney(savings * 3, cur);
+    a.out.m3d.textContent = fmtNum(days * 3, 0);
+    a.out.m12h.textContent = fmtNum(hoursSaved * 12, 0) + ' h';
+    a.out.m12s.textContent = fmtMoney(savings * 12, cur);
+    a.out.m12d.textContent = fmtNum(days * 12, 0);
+
+    return { hoursSaved, savings, cur };
+  }
+
+  // --- Panel 2: funnel ---
+  const f = {
+    leads: document.getElementById('f-leads'),
+    ticket: document.getElementById('f-ticket'),
+    ticketCur: document.getElementById('f-ticket-cur'),
+    rBase: document.getElementById('f-r-base'), rUp: document.getElementById('f-r-up'),
+    qBase: document.getElementById('f-q-base'), qUp: document.getElementById('f-q-up'),
+    wBase: document.getElementById('f-w-base'), wUp: document.getElementById('f-w-up'),
+    funnel: document.getElementById('funnel-up'),
+    deltaRev: document.getElementById('f-delta-rev'),
+    deltaSales: document.getElementById('f-delta-sales'),
+    convB: document.getElementById('f-conv-base'),
+    convU: document.getElementById('f-conv-up'),
+    s: {
+      rB: document.getElementById('f-s-r-b'), rU: document.getElementById('f-s-r-u'), rD: document.getElementById('f-s-r-d'),
+      qB: document.getElementById('f-s-q-b'), qU: document.getElementById('f-s-q-u'), qD: document.getElementById('f-s-q-d'),
+      wB: document.getElementById('f-s-w-b'), wU: document.getElementById('f-s-w-u'), wD: document.getElementById('f-s-w-d'),
+      revB: document.getElementById('f-s-rev-b'), revU: document.getElementById('f-s-rev-u'), revD: document.getElementById('f-s-rev-d'),
+    },
+  };
+
+  function stepFunnel(leads, r, q, w) {
+    const resp = Math.round(leads * r / 100);
+    const qual = Math.round(resp * q / 100);
+    const won = Math.round(qual * w / 100);
+    return { resp, qual, won };
+  }
+  function calcFunnel() {
+    const leads = +f.leads.value || 0;
+    const ticket = +f.ticket.value || 0;
+    const cur = document.getElementById('r-currency')?.value || 'EUR';
+    f.ticketCur.textContent = currencySymbols[cur] || cur;
+    const base = stepFunnel(leads, +f.rBase.value, +f.qBase.value, +f.wBase.value);
+    const up = stepFunnel(leads, +f.rUp.value, +f.qUp.value, +f.wUp.value);
+    const revB = base.won * ticket;
+    const revU = up.won * ticket;
+
+    // Funnel bars
+    const maxBar = Math.max(leads, 1);
+    const stages = [
+      { name: 'Prospectos', n: leads, last: false },
+      { name: 'Respondidos', n: up.resp, last: false },
+      { name: 'Calificados', n: up.qual, last: false },
+      { name: 'Ganados', n: up.won, last: true },
+    ];
+    f.funnel.innerHTML = stages.map(s => `
+      <div class="fstage ${s.last ? 'last' : ''}">
+        <span class="lab">${s.name}</span>
+        <div class="bar-track"><div class="bar" style="width:${Math.max(2, s.n / maxBar * 100)}%"></div></div>
+        <span class="num">${fmtNum(s.n)}</span>
+      </div>
+    `).join('');
+
+    f.deltaRev.textContent = fmtMoney(revU - revB, cur);
+    f.deltaSales.innerHTML = `${up.won - base.won >= 0 ? '+' : ''}${fmtNum(up.won - base.won)} <span class="unit">ventas</span>`;
+    f.convB.textContent = fmtNum(leads ? base.won / leads * 100 : 0, 1);
+    f.convU.textContent = fmtNum(leads ? up.won / leads * 100 : 0, 1);
+
+    f.s.rB.textContent = fmtNum(base.resp); f.s.rU.textContent = fmtNum(up.resp); f.s.rD.textContent = `+${fmtNum(up.resp - base.resp)}`;
+    f.s.qB.textContent = fmtNum(base.qual); f.s.qU.textContent = fmtNum(up.qual); f.s.qD.textContent = `+${fmtNum(up.qual - base.qual)}`;
+    f.s.wB.textContent = fmtNum(base.won);  f.s.wU.textContent = fmtNum(up.won);  f.s.wD.textContent = `+${fmtNum(up.won - base.won)}`;
+    f.s.revB.textContent = fmtMoney(revB, cur); f.s.revU.textContent = fmtMoney(revU, cur); f.s.revD.textContent = `+${fmtMoney(revU - revB, cur)}`;
+
+    return { deltaRev: revU - revB, deltaSales: up.won - base.won, ticket, cur };
+  }
+
+  // --- Panel 3: ROI ---
+  const r = {
+    cur: document.getElementById('r-currency'),
+    setup: document.getElementById('r-setup'),
+    monthly: document.getElementById('r-monthly'),
+    save: document.getElementById('r-save'),
+    sales: document.getElementById('r-sales'),
+    ticket: document.getElementById('r-ticket'),
+    margin: document.getElementById('r-margin'),
+    out: {
+      benefit: document.getElementById('r-benefit'),
+      ahorro: document.getElementById('r-ahorro'),
+      marginval: document.getElementById('r-marginval'),
+      costm: document.getElementById('r-costm'),
+      payback: document.getElementById('r-payback'),
+      roi: document.getElementById('r-roi'),
+      year: document.getElementById('r-year'),
+    },
+  };
+  function calcROI() {
+    const cur = r.cur.value;
+    const setup = +r.setup.value || 0;
+    const monthly = +r.monthly.value || 0;
+    const save = +r.save.value || 0;
+    const sales = +r.sales.value || 0;
+    const ticket = +r.ticket.value || 0;
+    const margin = (+r.margin.value || 0) / 100;
+
+    const salesMargin = sales * ticket * margin;
+    const benefit = save + salesMargin - monthly;
+    const payback = benefit > 0 ? setup / benefit : Infinity;
+    const totalCost12 = setup + monthly * 12;
+    const totalBenefit12 = (save + salesMargin) * 12;
+    const roi = totalCost12 > 0 ? (totalBenefit12 - totalCost12) / totalCost12 * 100 : 0;
+    const year = benefit * 12 - setup;
+
+    r.out.benefit.innerHTML = `${fmtMoney(benefit, cur)}`;
+    r.out.ahorro.textContent = fmtMoney(save, cur);
+    r.out.marginval.textContent = fmtMoney(salesMargin, cur);
+    r.out.costm.textContent = fmtMoney(monthly, cur);
+    r.out.payback.innerHTML = `${isFinite(payback) ? fmtNum(payback, 1) : '—'} <span class="unit">meses</span>`;
+    r.out.roi.innerHTML = `${fmtNum(roi, 0)} <span class="unit">%</span>`;
+    r.out.year.textContent = fmtMoney(year, cur);
+
+    return { benefit, payback, cur, year };
+  }
+
+  // --- Summary strip (top right) ---
+  const S = {
+    ahorro: document.getElementById('sum-ahorro'),
+    ventas: document.getElementById('sum-ventas'),
+    beneficio: document.getElementById('sum-beneficio'),
+    payback: document.getElementById('sum-payback'),
+  };
+
+  function calcAll() {
+    const auto = calcAutomation();
+    const fun = calcFunnel();
+    const roi = calcROI();
+    const cur = roi.cur;
+    S.ahorro.innerHTML = `${fmtMoney(auto.savings, auto.cur)} <span class="unit">/ período</span>`;
+    S.ventas.innerHTML = fun.deltaSales >= 0
+      ? `+${fmtMoney(fun.deltaRev, fun.cur)} <span class="unit">/ mes</span>`
+      : `${fmtMoney(fun.deltaRev, fun.cur)} <span class="unit">/ mes</span>`;
+    S.beneficio.innerHTML = `${fmtMoney(roi.benefit, cur)} <span class="unit">/ mes</span>`;
+    S.payback.innerHTML = isFinite(roi.payback)
+      ? `${fmtNum(roi.payback, 1)} <span class="unit">meses</span>`
+      : `— <span class="unit">no se paga</span>`;
+  }
+
+  document.querySelectorAll('input, select').forEach(el => {
+    el.addEventListener('input', calcAll);
+    el.addEventListener('change', calcAll);
+  });
+
+  // Footer date
+  const d = new Date();
+  document.getElementById('today').textContent = d.toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' });
+
+  calcAll();
+})();
+</script>
+
+</body></html>

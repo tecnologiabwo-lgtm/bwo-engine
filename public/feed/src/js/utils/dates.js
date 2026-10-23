@@ -1,0 +1,10 @@
+const pad=n=>String(n).padStart(2,'0');
+export const today=()=>{const d=new Date();return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;};
+export const dateKey=(y,m,d)=>`${y}-${pad(m+1)}-${pad(d)}`;
+export const daysAgo=n=>{const d=new Date();d.setDate(d.getDate()-n);return dateKey(d.getFullYear(),d.getMonth(),d.getDate());};
+const asDate=d=>new Date(d+'T12:00:00');
+export const shortDate=d=>d?asDate(d).toLocaleDateString('es',{day:'numeric',month:'short'}):'';
+export const longDate =d=>d?asDate(d).toLocaleDateString('es',{weekday:'long',day:'numeric',month:'long',year:'numeric'}):'—';
+export const stamp    =d=>d?new Date(d).toLocaleString('es',{day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+export const shortStamp=d=>d?new Date(d).toLocaleString('es',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+export const timeOnly =d=>d?new Date(d).toLocaleTimeString('es',{hour:'2-digit',minute:'2-digit'}):'';

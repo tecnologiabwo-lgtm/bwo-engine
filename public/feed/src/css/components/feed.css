@@ -1,0 +1,47 @@
+.feed-layout{display:grid;grid-template-columns:390px 1fr;gap:var(--sp-6);align-items:start}
+@media(max-width:900px){.feed-layout{grid-template-columns:1fr}.phone{position:static}}
+.ig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--ig-bg)}
+.ig-cell{position:relative;aspect-ratio:var(--ar-grid);background:var(--ig-cell);overflow:hidden;cursor:pointer;border:none;padding:0;display:block;width:100%}
+.ig-cell.reel{aspect-ratio:var(--ar-story)}
+.ig-cell img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none}
+.ig-cell .ph{width:100%;height:100%;display:grid;place-items:center;color:var(--ig-dim);font-size:var(--fs-sm);font-weight:var(--fw-medium);text-align:center;padding:var(--sp-1)}
+.ig-cell .sbadge{position:absolute;top:5px;left:5px;width:19px;height:19px;border-radius:50%;display:grid;place-items:center;
+  color:var(--white);font-size:var(--fs-xs);font-weight:var(--fw-black);box-shadow:var(--shadow-sm);z-index:2}
+.ig-cell .fmt{position:absolute;top:5px;right:5px;color:var(--white);filter:drop-shadow(0 1px 2px var(--ig-bg))}
+.ig-cell .pin{position:absolute;top:5px;right:24px;filter:drop-shadow(0 1px 2px var(--ig-bg))}
+.ig-cell .dchip{position:absolute;bottom:7px;right:5px;background:rgba(0,0,0,.6);color:var(--white);font-size:9.5px;
+  font-weight:var(--fw-bold);padding:2px 6px;border-radius:6px}
+.ig-cell .pdot{position:absolute;bottom:8px;left:5px;width:9px;height:9px;border-radius:3px;box-shadow:0 1px 2px var(--ig-bg)}
+.ig-cell .chk{position:absolute;inset:0;background:rgba(0,0,0,.2);display:flex;align-items:flex-start;justify-content:flex-end;padding:var(--sp-2);z-index:3}
+.ig-cell .chk i{width:21px;height:21px;border-radius:50%;border:2px solid var(--white);display:grid;place-items:center;
+  font-style:normal;font-size:var(--fs-sm);font-weight:var(--fw-black);color:var(--white);box-shadow:var(--shadow-sm)}
+.ig-cell.sel .chk{background:rgba(108,59,245,.32)}
+.ig-cell.sel .chk i{background:var(--brand-violet)}
+.ig-cell.locked{opacity:.35}
+/* Arrastre estilo Instagram */
+.ig-grid.sorting{touch-action:none}
+.ig-cell.lifted{opacity:.25}
+.drag-ghost{position:fixed;z-index:150;pointer-events:none;border-radius:var(--radius-sm);overflow:hidden;
+  box-shadow:0 18px 40px rgba(0,0,0,.55);transform-origin:center;transition:transform .12s ease}
+.drag-ghost img{width:100%;height:100%;object-fit:cover;display:block}
+.ig-cell.shifting{transition:transform .18s cubic-bezier(.2,.9,.3,1)}
+.side-panel{display:flex;flex-direction:column;gap:var(--sp-4)}
+.share-box{background:linear-gradient(135deg,rgba(108,59,245,.14),rgba(34,211,197,.1));border:1px solid var(--border-strong);
+  border-radius:var(--radius-md);padding:13px}
+.share-box.warn{background:rgba(245,166,35,.1);border-color:rgba(245,166,35,.35)}
+.share-box .url{font-size:var(--fs-sm);color:var(--brand-turquoise);word-break:break-all;font-family:ui-monospace,monospace;margin:var(--sp-2) 0 10px}
+.legend{display:flex;flex-direction:column;gap:var(--sp-2)}
+.legend .li{display:flex;align-items:center;gap:var(--sp-2);font-size:var(--fs-base)}
+.legend .dot{width:12px;height:12px;border-radius:var(--sp-1);flex-shrink:0}
+.legend .ct{margin-left:auto;color:var(--text-muted);font-weight:var(--fw-medium);font-size:12px}
+.status-legend{display:flex;flex-wrap:wrap;gap:var(--sp-2) var(--sp-3)}
+.status-legend .li{display:flex;align-items:center;gap:6px;font-size:var(--fs-sm);color:var(--text-muted)}
+.status-legend .bar{width:16px;height:4px;border-radius:3px}
+.dims{display:flex;flex-direction:column;gap:7px}
+.dims .d{display:flex;align-items:center;gap:var(--sp-2);font-size:12.5px;padding:7px var(--sp-2);background:var(--panel-strong);border-radius:var(--radius-sm)}
+.dims .d .ico{width:22px;text-align:center}
+.dims .d small{display:block;color:var(--text-faint);font-size:var(--fs-xs)}
+.dims .d .px{margin-left:auto;color:var(--brand-turquoise);font-weight:var(--fw-bold);font-size:var(--fs-sm)}
+.bulkbar{position:sticky;top:10px;z-index:20;display:flex;align-items:center;gap:var(--sp-2);flex-wrap:wrap;
+  background:var(--bg-elevated);border:1px solid var(--border-strong);border-radius:var(--radius-lg);
+  padding:10px var(--sp-4);margin-bottom:var(--sp-4);box-shadow:var(--shadow-md)}

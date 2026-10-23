@@ -1,0 +1,10 @@
+import {sb,run,limited,runAll} from './db.js';
+export const listClients =()=>runAll(()=>sb.from('clients').select('*').order('created_at'));
+export const getClient   =id=>run(sb.from('clients').select('*').eq('id',id).single());
+export const createClient=row=>run(sb.from('clients').insert(row).select().single());
+export const updateClient=(id,patch)=>run(sb.from('clients').update(patch).eq('id',id));
+export const deleteClient=id=>run(sb.from('clients').delete().eq('id',id));
+export const listPillars =clientId=>run(limited(sb.from('pillars').select('*').eq('client_id',clientId).order('sort')));
+export const addPillars  =rows=>run(sb.from('pillars').insert(rows));
+export const updatePillar=(id,patch)=>run(sb.from('pillars').update(patch).eq('id',id));
+export const deletePillar=id=>run(sb.from('pillars').delete().eq('id',id));
