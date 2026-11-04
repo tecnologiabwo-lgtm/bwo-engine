@@ -1,6 +1,15 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
+<script>
+/* Errores del Feed clásico → registro de errores de BWO Engine (client_errors) */
+(function(){var n=0,last={};function send(msg,stack,src){try{msg=String(msg||'Error').slice(0,1000);if(/ResizeObserver|Script error/i.test(msg))return;var t=Date.now();if(last[msg]&&t-last[msg]<60000)return;last[msg]=t;if(++n>20)return;
+fetch('https://getnxeflqaqzdujbxqeu.supabase.co/rest/v1/rpc/log_client_error',{method:'POST',headers:{'Content-Type':'application/json',apikey:'sb_publishable_JlIL10KIgsi16xgCwK_soA_yF3MZ7HV',Authorization:'Bearer sb_publishable_JlIL10KIgsi16xgCwK_soA_yF3MZ7HV'},
+body:JSON.stringify({p_message:msg,p_stack:stack?String(stack).slice(0,6000):null,p_url:location.pathname,p_release:'feed-clasico',p_user_agent:navigator.userAgent.slice(0,300),p_context:{source:src}})}).catch(function(){});}catch(e){}}
+addEventListener('error',function(e){send(e.message,e.error&&e.error.stack,'feed.error');});
+addEventListener('unhandledrejection',function(e){var r=e.reason||{};send(r.message||r,r.stack,'feed.promise');});})();
+</script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Panel · Feed Planner · Big Way Offices</title>

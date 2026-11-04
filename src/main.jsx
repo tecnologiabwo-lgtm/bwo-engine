@@ -3,6 +3,9 @@ import { createRoot } from "react-dom/client";
 import { MotionConfig } from "motion/react";
 import "./index.css";
 import App from "./app/App.jsx";
+import { initMonitoring } from "@/shared/lib/monitoring";
+
+initMonitoring();
 
 createRoot(document.getElementById("root")).render(
   <React.StrictMode>

@@ -9,7 +9,7 @@
  * canvas: "dark" (por defecto) o "light" (módulo con su propio diseño claro).
  */
 import { lazy } from "react";
-import { Home, Users2, LayoutGrid, Clapperboard, BarChart3, FileBarChart, Calculator, Receipt, Tags } from "lucide-react";
+import { Home, Users2, LayoutGrid, Clapperboard, BarChart3, FileBarChart, Calculator, Receipt, Tags, ShieldCheck } from "lucide-react";
 
 export const MODULES = [
   { id: "inicio", path: "inicio", label: "Inicio", icon: Home, roles: ["admin", "viewer"],
@@ -30,6 +30,8 @@ export const MODULES = [
     Component: lazy(() => import("../features/calculator/CalculadoraApp.jsx")) },
   { id: "precios", path: "precios", label: "Precios y planes", icon: Tags, roles: ["admin"],
     Component: lazy(() => import("../features/pricing/PreciosApp.jsx")) },
+  { id: "monitoreo", path: "monitoreo", label: "Auditoría y errores", icon: ShieldCheck, roles: ["admin"],
+    Component: lazy(() => import("../features/monitoring/MonitoreoApp.jsx")) },
 ];
 
 export const modulesFor = (role) => MODULES.filter((m) => m.roles.includes(role));

@@ -11,6 +11,7 @@ import { Hourglass, ShieldOff } from "lucide-react";
 import Login from "@/features/auth/Login.jsx";
 import Account from "@/features/auth/Account.jsx";
 import { MODULES } from "./modules.js";
+import ErrorBoundary from "@/shared/ui/ErrorBoundary";
 
 /** Pantalla para cuentas que aún no puede usar la plataforma. */
 function Hold({ icon: Icon, title, children }) {
@@ -52,9 +53,9 @@ function ModuleRoute({ m }) {
   const C = m.Component;
   if (m.canvas === "light") {
     // Consolidador: diseño claro propio, en un lienzo flotante sobre el fondo oscuro
-    return <div className="overflow-hidden rounded-2xl shadow-2xl" style={{ boxShadow: "0 20px 60px rgba(0,0,0,.45)" }}><C /></div>;
+    return <ErrorBoundary name={m.label} resetKey={m.id}><div className="overflow-hidden rounded-2xl shadow-2xl" style={{ boxShadow: "0 20px 60px rgba(0,0,0,.45)" }}><C /></div></ErrorBoundary>;
   }
-  return <div className="bwo"><C /></div>;
+  return <ErrorBoundary name={m.label} resetKey={m.id}><div className="bwo"><C /></div></ErrorBoundary>;
 }
 
 function Unconfigured() {
