@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
-import { ArrowLeft, ExternalLink, Copy, QrCode, Wrench } from "lucide-react";
+import { ArrowLeft, ExternalLink, Copy, QrCode, Wrench, ShoppingBag } from "lucide-react";
 import { Button, Card, PageHeader, Badge } from "@/shared/ui/primitives";
 import { Biwi, SOCIAL } from "@/shared/ui/brand";
 import { useToast } from "@/shared/ui/toast";
@@ -9,6 +9,7 @@ import { TOOLS, TAGS, toolById } from "./catalog.js";
 
 function ToolIcon({ icon, className }) {
   if (icon === "whatsapp") return <img src={SOCIAL.whatsapp} alt="" className={cn("size-9", className)} />;
+  if (icon === "store") return <span className={cn("grid size-9 place-items-center rounded-xl bg-bwo-cerise/20 text-bwo-ceriseLt", className)}><ShoppingBag className="size-5" /></span>;
   return <span className={cn("grid size-9 place-items-center rounded-xl bg-bwo-violet/20 text-bwo-violetLt", className)}><QrCode className="size-5" /></span>;
 }
 
@@ -46,7 +47,7 @@ export default function ToolsApp() {
         {list.map((t) => (
           <Link key={t.id} to={`/herramientas/${t.id}`} className="group block">
             <Card className="h-full transition hover:-translate-y-0.5 hover:border-white/20">
-              <div className="mb-3 flex items-center gap-3"><ToolIcon icon={t.icon} /><Badge color={t.tag === "Captación" ? "turquoise" : t.tag === "Presupuesto" ? "amber" : "violet"}>{t.tag}</Badge></div>
+              <div className="mb-3 flex items-center gap-3"><ToolIcon icon={t.icon} /><Badge color={t.tag === "Captación" ? "turquoise" : t.tag === "Presupuesto" ? "amber" : t.tag === "E-commerce" ? "cerise" : "violet"}>{t.tag}</Badge></div>
               <div className="text-base font-bold text-white">{t.title}</div>
               <p className="mt-1 text-sm text-slate-400">{t.desc}</p>
               <div className="mt-3 flex flex-wrap gap-1.5">{t.uses.map((u) => <span key={u} className="rounded-full bg-white/5 px-2 py-0.5 text-[11px] text-slate-300">{u}</span>)}</div>

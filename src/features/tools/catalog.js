@@ -14,6 +14,9 @@ export const TOOLS = [
   { id: "qr", title: "Generador de códigos QR", tag: "Utilidades", icon: "qr",
     desc: "QR para URL, correo, Wi-Fi, contacto (vCard), llamada, SMS, texto y WhatsApp, con colores y logo.",
     src: "/recursos/generador-codigos-qr.html", uses: ["Tarjetas de presentación", "Material impreso"] },
+  { id: "productos-sellibri", title: "Carga de productos para Sellibri", tag: "E-commerce", icon: "store",
+    desc: "Arma el catálogo producto por producto (variantes, inventario, imágenes, SEO), valida errores y descarga el CSV listo para importar en Sellibri.",
+    src: "/recursos/carga-productos-sellibri.html", uses: ["Onboarding del Programa 06", "Que el cliente cargue sus productos"] },
 ];
 export const TAGS = ["Todas", ...new Set(TOOLS.map((t) => t.tag))];
 export const toolById = (id) => TOOLS.find((t) => t.id === id);

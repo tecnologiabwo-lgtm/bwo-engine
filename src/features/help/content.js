@@ -137,6 +137,16 @@ Atajos: _Espacio_ iniciar/pausar · _↑ ↓_ velocidad · _+ −_ tamaño · _M
 Si el envío falla, verás el motivo junto a la invitación y podrás reenviarla.
 `, "agencia"),
 
+  A("tutorial-sellibri", "tutoriales", "Cargar productos para Sellibri", "Del catálogo del cliente al CSV de importación.", `
+1. Abre **Herramientas → Carga de productos para Sellibri** (o comparte el enlace público con el cliente).
+2. Agrega cada producto: título, descripción, precio, inventario y fotos (enlaces https).
+3. Si viene en colores o tallas, crea las **opciones**: se generan todas las combinaciones con su SKU, precio y cantidad.
+4. Pulsa **Revisar y descargar**. Corrige lo marcado en rojo; los avisos en amarillo no impiden descargar.
+5. Descarga el CSV e impórtalo en el panel de Sellibri.
+
+> El avance se guarda en el navegador. Puedes cerrar y seguir después, o volver a cargar un CSV que ya descargaste.
+`),
+
   // ── Técnica
   A("arquitectura", "tecnica", "Arquitectura", "React + Supabase + Vercel, organizado por funcionalidad.", `
 - **Frontend:** Vite + React 18 + Tailwind, desplegado en **Vercel** desde la rama main de GitHub.
