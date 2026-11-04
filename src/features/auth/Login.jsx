@@ -1,4 +1,4 @@
-import { BwoMark, Biwi } from "@/shared/ui/brand";
+import { BigwayLogo, Biwi } from "@/shared/ui/brand";
 import { useState } from "react";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
@@ -54,7 +54,7 @@ export default function Login() {
       <Backdrop />
       <div className="grid w-full max-w-5xl items-center gap-10 lg:grid-cols-[1.1fr_1fr]">
         <div className="hidden lg:block">
-          <div className="mb-4 text-xs font-bold uppercase tracking-[.2em] text-bwo-amber">Big Way Offices</div>
+          <BigwayLogo className="mb-8 h-12" />
           <TextAnimation as="h1" text="Convertimos ideas en sistemas que venden." classname="text-6xl font-black leading-[1.02] tracking-tight text-white" />
           <TextAnimation as="p" letterAnime stagger={0.012} text="Feed, guiones, reportes, cotizaciones y proyecciones en un solo lugar."
             classname="mt-6 max-w-md text-lg text-slate-300"
@@ -64,9 +64,9 @@ export default function Login() {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <LiquidGlassCard borderRadius="24px" blurIntensity="lg" shadowIntensity="md" glowIntensity="md" className="p-8">
             <div className="relative z-10">
-              <div className="mb-5 flex items-center gap-3">
-                <BwoMark className="h-12" />
-                <div><div className="text-lg font-extrabold text-white">BWO Engine</div><div className="text-xs text-slate-400">{mode === "login" ? "Ingresa con tu cuenta" : "Solicita acceso a tu portal"}</div></div>
+              <div className="mb-6">
+                <BigwayLogo className="h-10" />
+                <div className="mt-3"><span className="text-lg font-extrabold text-white">BWO Engine</span> <span className="text-xs text-slate-400">· {mode === "login" ? "Ingresa con tu cuenta" : "Solicita acceso a tu portal"}</span></div>
               </div>
               {!sent && (
                 <div className="mb-5 grid grid-cols-2 rounded-xl bg-white/5 p-1 text-sm font-semibold" role="tablist">

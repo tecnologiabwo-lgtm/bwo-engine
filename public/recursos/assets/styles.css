@@ -317,3 +317,5 @@ ol.steps span { color: var(--ink-2); }
 .embed .site-header, .embed .site-footer, .embed .cta-band, .embed .crumbs, .embed .skip { display: none !important; }
 .embed body { background: transparent; }
 .embed .intro { padding-top: 12px; }
+
+.logo-img { height: 30px; width: auto; display: block; }

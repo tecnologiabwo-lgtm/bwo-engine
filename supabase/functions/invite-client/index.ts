@@ -23,7 +23,8 @@ function emailHtml({ name, clientName, link, existing, site }: { name: string; c
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:#0D0E24;padding:32px 12px"><tr><td align="center">
 <table role="presentation" width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#17183A;border-radius:20px;overflow:hidden">
 <tr><td style="height:6px;background:linear-gradient(90deg,#F5A623,#E6197E,#6C3BF5,#22D3C5)"></td></tr>
-<tr><td style="padding:28px 32px 8px"><img src="${site}/brand/biwi.webp" width="96" height="104" alt="Biwi" style="display:block"></td></tr>
+<tr><td style="padding:28px 32px 4px"><img src="${site}/brand/logo-bigway-light.png" width="170" height="48" alt="Big Way Offices" style="display:block;border:0"></td></tr>
+<tr><td style="padding:16px 32px 8px"><img src="${site}/brand/biwi.png" width="96" height="102" alt="Biwi" style="display:block;border:0"></td></tr>
 <tr><td style="padding:0 32px"><h1 style="margin:12px 0 8px;font-size:22px;color:#fff">${hi} 👋</h1>
 <p style="margin:0 0 16px;font-size:15px;line-height:1.55;color:#C9CBE6">${intro}</p>
 <p style="margin:0 0 24px;font-size:15px;line-height:1.55;color:#C9CBE6">Soy Biwi, el asistente de Big Way. Te acompaño en tus primeros pasos.</p>

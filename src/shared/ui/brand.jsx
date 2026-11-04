@@ -1,7 +1,17 @@
 import { motion, useReducedMotion } from "motion/react";
 import { cn } from "@/shared/lib/utils";
 
-/** Isotipo de Big Way (formas geométricas de la marca). */
+/** Logo horizontal oficial. tone="light" (texto blanco) para fondos oscuros; "dark" para fondos claros. */
+export function BigwayLogo({ tone = "light", className }) {
+  return <img src={`/brand/logo-bigway-${tone}.webp`} alt="Big Way Offices" width="900" height="255" className={cn("h-9 w-auto select-none", className)} draggable={false} />;
+}
+
+/** Isotipo "B" (las cuatro formas) sin fondo, para espacios pequeños. */
+export function Isotipo({ className }) {
+  return <img src="/brand/isotipo.webp" alt="Big Way" width="256" height="255" className={cn("size-9 select-none", className)} draggable={false} />;
+}
+
+/** Elemento gráfico vertical de la marca (decorativo). */
 export function BwoMark({ className }) {
   return <img src="/brand/bwo-mark.webp" alt="Big Way Offices" width="160" height="400" className={cn("h-10 w-auto select-none", className)} draggable={false} />;
 }

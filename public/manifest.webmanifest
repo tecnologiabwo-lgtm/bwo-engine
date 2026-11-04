@@ -1,0 +1,12 @@
+{
+  "name": "BWO Engine — Big Way Offices",
+  "short_name": "BWO Engine",
+  "start_url": "/inicio",
+  "display": "standalone",
+  "background_color": "#1D2041",
+  "theme_color": "#1D2041",
+  "icons": [
+    { "src": "/brand/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/brand/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

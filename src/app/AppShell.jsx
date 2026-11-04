@@ -1,4 +1,4 @@
-import { BwoMark } from "@/shared/ui/brand";
+import { BigwayLogo, Isotipo } from "@/shared/ui/brand";
 import { Suspense, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
@@ -41,11 +41,10 @@ function Sidebar({ onNavigate }) {
   const role = profile?.role || "viewer";
   return (
     <LiquidGlassCard glowIntensity="sm" shadowIntensity="sm" borderRadius="20px" blurIntensity="md" className="flex h-full w-[264px] flex-col p-4">
-      <div className="mb-5 flex items-center gap-3 px-1">
-        <BwoMark className="h-11" />
-        <div>
-          <div className="text-sm font-extrabold leading-tight text-white">BWO Engine</div>
-          <div className="text-[10px] text-slate-400">{role === "admin" ? "Agencia · Big Way Offices" : "Portal de clientes"}</div>
+      <div className="mb-5 px-1">
+        <BigwayLogo className="h-9" />
+        <div className="mt-2 flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[.14em] text-slate-400">
+          <span className="text-white">BWO Engine</span><span aria-hidden="true">·</span><span>{role === "admin" ? "Agencia" : "Portal de clientes"}</span>
         </div>
       </div>
       <ClientPicker />
@@ -87,6 +86,7 @@ export default function AppShell() {
         <aside className="bwo sticky top-5 hidden h-[calc(100vh-2.5rem)] lg:block"><Sidebar /></aside>
         <div className="bwo fixed inset-x-3 top-3 z-40 flex items-center justify-between lg:hidden">
           <button onClick={() => setOpen(true)} className="grid size-10 place-items-center rounded-xl border border-white/15 bg-bwo-ink/80 backdrop-blur" aria-label="Abrir menú"><Menu className="size-5" /></button>
+          <span className="rounded-xl border border-white/15 bg-bwo-ink/80 px-3 py-2 backdrop-blur"><BigwayLogo className="h-6" /></span>
         </div>
         <AnimatePresence>
           {open && (
