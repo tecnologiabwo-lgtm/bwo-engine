@@ -1,6 +1,6 @@
 import { BigwayLogo, Isotipo } from "@/shared/ui/brand";
 import { Suspense, useState } from "react";
-import { NavLink, Outlet, useLocation } from "react-router-dom";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { LogOut, Menu, X, ChevronsUpDown, UserCircle2 } from "lucide-react";
 import { LiquidGlassCard } from "@/shared/ui/liquid-glass";
@@ -21,15 +21,22 @@ export function Backdrop() {
   );
 }
 
-function ClientPicker() {
+const NEW = "__nuevo__";
+function ClientPicker({ onNavigate }) {
   const { clients, clientId, choose } = useClient();
-  if (!clients.length) return <p className="px-1 text-xs text-slate-400">Sin clientes asignados</p>;
+  const { isAdmin } = useAuth();
+  const nav = useNavigate();
+  const create = () => { nav("/clientes?nuevo=1"); onNavigate?.(); };
+  if (!clients.length) return isAdmin
+    ? <button onClick={create} className="w-full rounded-xl border border-dashed border-white/20 px-3 py-2 text-left text-sm font-semibold text-white hover:bg-white/5">+ Crear el primer cliente</button>
+    : <p className="px-1 text-xs text-slate-400">Sin clientes asignados</p>;
   return (
     <label className="relative block">
       <span className="mb-1 block px-1 text-[10px] font-bold uppercase tracking-[.14em] text-slate-400">Cliente</span>
-      <select value={clientId || ""} onChange={(e) => choose(e.target.value)}
+      <select value={clientId || ""} onChange={(e) => (e.target.value === NEW ? create() : choose(e.target.value))}
         className="w-full appearance-none rounded-xl border border-white/15 bg-white/10 py-2 pl-3 pr-8 text-sm font-semibold text-white outline-none focus:border-bwo-violet [&>option]:text-bwo-ink">
         {clients.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}
+        {isAdmin && <option value={NEW}>＋ Nuevo cliente…</option>}
       </select>
       <ChevronsUpDown className="pointer-events-none absolute bottom-2.5 right-2.5 size-4 text-slate-400" />
     </label>
@@ -47,7 +54,7 @@ function Sidebar({ onNavigate }) {
           <span className="text-white">BWO Engine</span><span aria-hidden="true">·</span><span>{role === "admin" ? "Agencia" : "Portal de clientes"}</span>
         </div>
       </div>
-      <ClientPicker />
+      <ClientPicker onNavigate={onNavigate} />
       <nav className="relative z-30 mt-4 flex-1 space-y-1 overflow-y-auto" aria-label="Módulos">
         {modulesFor(role).map((m) => {
           const Icon = m.icon;

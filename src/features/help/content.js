@@ -128,6 +128,14 @@ Atajos: _Espacio_ iniciar/pausar · _↑ ↓_ velocidad · _+ −_ tamaño · _M
 3. En la pestaña _Publicar_ pulsa **Guardar en el histórico mensual**. Si el informe abarca varios meses, se reparte por día cuando hay detalle diario, o en proporción a los días de cada mes cuando no lo hay.
 4. En **Histórico** cambia entre mes, trimestre y año. Compara con el periodo anterior y con el mismo periodo del año pasado.
 `, "agencia"),
+  A("tutorial-nuevo-cliente", "tutoriales", "Crear un cliente nuevo", "Dónde y cómo dar de alta una empresa.", `
+1. Ve a **Clientes y accesos** y pulsa **Nuevo cliente** (o elige _＋ Nuevo cliente…_ en el selector de cliente del menú).
+2. Escribe el nombre de la empresa y su usuario de Instagram. Lo demás es opcional.
+3. Deja marcada la opción de **pilares base** para empezar a planificar enseguida.
+4. Al crearlo queda seleccionado en todo BWO Engine: Feed, Sala, Reportes e Histórico.
+5. Sube la foto de perfil y ajusta los pilares en **Feed → Perfil y pilares**.
+6. Para que la persona del cliente entre a su portal, usa **Invitar por correo**.
+`, "agencia"),
   A("tutorial-invitar", "tutoriales", "Invitar a un cliente por correo", "El cliente entra ya verificado y vinculado a su empresa.", `
 1. Ve a **Clientes y accesos → Invitar por correo**.
 2. Escribe el correo y el nombre, y elige el cliente.

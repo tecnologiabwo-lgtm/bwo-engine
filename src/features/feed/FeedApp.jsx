@@ -188,7 +188,7 @@ export default function FeedApp() {
         actions={<div className="flex rounded-xl border border-white/10 p-0.5 text-xs">
           {[["react", "Nueva versión"], ["clasico", "Versión clásica"]].map(([k, l]) => <button key={k} onClick={() => pick(k)} className={cn("rounded-lg px-3 py-1.5 font-semibold", mode === k ? "bg-white/10 text-white" : "text-slate-400")}>{l}</button>)}
         </div>} />
-      {!client ? <Empty icon={LayoutGrid} title="Elige un cliente" />
+      {!client ? <Empty icon={LayoutGrid} title={isAdmin ? "Aún no hay clientes" : "Elige un cliente"}>{isAdmin && <a href="/clientes?nuevo=1" className="font-semibold text-bwo-turquoiseLt underline">Crear el primer cliente</a>}</Empty>
         : mode === "clasico" ? <Classic isAdmin={isAdmin} client={client} />
         : <ReactFeed key={client.id} client={client} isAdmin={isAdmin} actor={actor} />}
     </div>

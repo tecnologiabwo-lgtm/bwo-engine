@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { UserPlus, X, Shield, Eye, Link as LinkIcon, Check, Ban, Hourglass, RotateCcw } from "lucide-react";
+import { Plus, UserPlus, X, Shield, Eye, Link as LinkIcon, Check, Ban, Hourglass, RotateCcw } from "lucide-react";
 import { useAuth } from "@/features/auth/auth";
 import { supabase, run } from "@/shared/lib/supabase";
 import { Badge, Button, Card, ErrorBox, Input, PageHeader, Select, Spinner } from "@/shared/ui/primitives";
 import { useToast } from "@/shared/ui/toast";
 import InvitePanel from "./InvitePanel.jsx";
+import NewClientModal from "./NewClientModal.jsx";
 
 export default function ClientesApp() {
   const { profile, reload } = useAuth();
@@ -13,6 +14,7 @@ export default function ClientesApp() {
   const [err, setErr] = useState("");
   const [email, setEmail] = useState({});
   const [pick, setPick] = useState({});   // usuario pendiente → cliente elegido
+  const [creating, setCreating] = useState(() => new URLSearchParams(location.search).has("nuevo"));
 
   const load = async () => {
     try {
@@ -66,7 +68,10 @@ export default function ClientesApp() {
   return (
     <div>
       <PageHeader eyebrow="Agencia" title="Clientes y accesos"
-        subtitle="Los clientes se crean en el Feed Planner. Aquí decides qué usuarios (espectadores) ven cada cliente en su portal: feed, guiones, reportes, cotizador y calculadora." />
+        subtitle="Crea aquí cada cliente (empresa) y decide qué personas lo ven en su portal: feed, guiones, reportes, cotizador y calculadora."
+        actions={<Button onClick={() => setCreating(true)}><Plus className="size-4" />Nuevo cliente</Button>} />
+      <NewClientModal open={creating} onClose={() => setCreating(false)} onCreated={load} />
+      {data.clients.length === 0 && <Card className="mb-8 text-sm text-slate-300">Aún no hay clientes. Pulsa <b className="text-white">Nuevo cliente</b> para crear el primero.</Card>}
       <InvitePanel clients={data.clients} onDone={load} />
       {pending.length > 0 && (
         <Card className="mb-8 border-bwo-amber/30">
