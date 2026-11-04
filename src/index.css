@@ -22,3 +22,12 @@ body { margin: 0; font-family: 'Archivo', system-ui, sans-serif; -webkit-font-sm
   .no-print { display: none !important; }
   body { background: #fff; }
 }
+
+/* Skeletons de carga */
+.bwo-skel {
+  background: linear-gradient(90deg, rgba(255,255,255,.05) 0%, rgba(255,255,255,.11) 40%, rgba(255,255,255,.05) 80%);
+  background-size: 300% 100%;
+  animation: bwo-shimmer 1.6s ease-in-out infinite;
+}
+@keyframes bwo-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
+@media (prefers-reduced-motion: reduce) { .bwo-skel { animation: none; } }

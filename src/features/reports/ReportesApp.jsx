@@ -66,7 +66,7 @@ export default function ReportesApp() {
   };
 
   if (err) return <ErrorBox error={`No se pudieron cargar los reportes: ${err}`} onRetry={load} />;
-  if (!rows) return <Spinner />;
+  if (!rows) return <Spinner variant="cards" />;
   return (
     <div>
       <PageHeader eyebrow={client?.name} title={isAdmin ? "Reportes publicados" : "Mis reportes"}

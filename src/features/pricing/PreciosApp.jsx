@@ -111,7 +111,7 @@ export default function PreciosApp() {
   const { items, settings, source, error, reload } = useCatalog();
   const [extra, setExtra] = useState([]);
   const [cat, setCat] = useState("program");
-  if (source === "loading") return <Spinner />;
+  if (source === "loading") return <Spinner variant="list" />;
   const list = [...items, ...extra].filter((i) => i.category === cat).sort((a, b) => a.sort - b.sort);
   const add = () => {
     const name = prompt("Nombre del nuevo servicio o plan:");

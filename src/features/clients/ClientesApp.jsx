@@ -58,7 +58,7 @@ export default function ClientesApp() {
   const copyLink = (c) => navigator.clipboard.writeText(`${location.origin}/feed/cliente.html?token=${c.share_token}`).then(() => toast("Link público del feed copiado"), () => toast("No se pudo copiar", "error"));
 
   if (err) return <ErrorBox error={`No se pudieron cargar los clientes: ${err}. ¿Se aplicó la migración 0005?`} onRetry={load} />;
-  if (!data) return <Spinner />;
+  if (!data) return <Spinner variant="list" />;
   const byId = new Map(data.profiles.map((p) => [p.id, p]));
   const pending = data.profiles.filter((p) => p.status === "pending");
   const guess = (p) => data.clients.find((c) => p.company && c.name.toLowerCase().includes(p.company.toLowerCase().slice(0, 6)))?.id || "";

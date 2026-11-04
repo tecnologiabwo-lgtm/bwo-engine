@@ -12,6 +12,7 @@ import Login from "@/features/auth/Login.jsx";
 import Account from "@/features/auth/Account.jsx";
 import { MODULES } from "./modules.js";
 import ErrorBoundary from "@/shared/ui/ErrorBoundary";
+import { AppSkeleton } from "@/shared/ui/skeleton";
 
 /** Pantalla para cuentas que aún no puede usar la plataforma. */
 function Hold({ icon: Icon, title, children }) {
@@ -34,7 +35,7 @@ function Hold({ icon: Icon, title, children }) {
 
 function Gate({ children }) {
   const { loading, session, error, status } = useAuth();
-  if (loading) return <div className="bwo grid min-h-screen place-items-center"><Spinner label="Entrando…" /></div>;
+  if (loading) return <AppSkeleton />;
   if (!session) return <Navigate to="/login" replace />;
   if (error) return <div className="bwo p-8"><ErrorBox error={`No pudimos cargar tu perfil: ${error}`} /></div>;
   if (status === "pending") return <Hold icon={Hourglass} title="Estamos verificando tu registro">El equipo de Big Way Offices revisará tus datos y te dará acceso al portal de tu empresa. Te avisaremos por correo o WhatsApp.</Hold>;

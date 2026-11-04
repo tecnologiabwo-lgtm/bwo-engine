@@ -49,7 +49,7 @@ export default function HistoricoApp() {
   };
 
   if (err) return <ErrorBox error={`No se pudo cargar el histórico: ${err}`} onRetry={load} />;
-  if (!data) return <Spinner />;
+  if (!data) return <Spinner variant="page" />;
   return (
     <div>
       <PageHeader eyebrow={client?.name} title="Histórico de resultados"

@@ -8,6 +8,7 @@ import { supabase } from "@/shared/lib/supabase";
 import { AnimatedNumber } from "@/shared/ui/number";
 import TextAnimation from "@/shared/ui/scroll-text";
 import { Card } from "@/shared/ui/primitives";
+import { Skeleton } from "@/shared/ui/skeleton";
 
 const COUNT = { style: "decimal", maximumFractionDigits: 0 };
 
@@ -20,7 +21,7 @@ async function count(q) {
 export default function Home() {
   const { profile, isAdmin } = useAuth();
   const { client, clientId } = useClient();
-  const [k, setK] = useState({});
+  const [k, setK] = useState(null);
 
   useEffect(() => {
     let off = false;
@@ -42,16 +43,16 @@ export default function Home() {
   const name = profile?.full_name || (profile?.email || "").split("@")[0];
   const cards = isAdmin
     ? [
-        { to: "/feed", icon: LayoutGrid, label: "Posts esperando al cliente", n: k.posts, tone: "#A78BFA" },
-        { to: "/feed", icon: LayoutGrid, label: "Posts con cambios pedidos", n: k.changes, tone: "#E6197E" },
-        { to: "/sala", icon: Clapperboard, label: "Guiones en aprobación", n: k.pieces, tone: "#F5A623" },
-        { to: "/cotizador", icon: Receipt, label: "Cotizaciones solicitadas por clientes", n: k.quotes, tone: "#22D3C5" },
+        { to: "/feed", icon: LayoutGrid, label: "Posts esperando al cliente", n: k?.posts, tone: "#A78BFA" },
+        { to: "/feed", icon: LayoutGrid, label: "Posts con cambios pedidos", n: k?.changes, tone: "#E6197E" },
+        { to: "/sala", icon: Clapperboard, label: "Guiones en aprobación", n: k?.pieces, tone: "#F5A623" },
+        { to: "/cotizador", icon: Receipt, label: "Cotizaciones solicitadas por clientes", n: k?.quotes, tone: "#22D3C5" },
       ]
     : [
-        { to: "/feed", icon: LayoutGrid, label: "Publicaciones por aprobar", n: k.posts, tone: "#A78BFA" },
-        { to: "/sala", icon: Clapperboard, label: "Guiones por aprobar", n: k.pieces, tone: "#F5A623" },
-        { to: "/reportes", icon: FileBarChart, label: "Reportes disponibles", n: k.reports, tone: "#22D3C5" },
-        { to: "/cotizador", icon: Receipt, label: "Cotizaciones enviadas", n: k.quotes, tone: "#E6197E" },
+        { to: "/feed", icon: LayoutGrid, label: "Publicaciones por aprobar", n: k?.posts, tone: "#A78BFA" },
+        { to: "/sala", icon: Clapperboard, label: "Guiones por aprobar", n: k?.pieces, tone: "#F5A623" },
+        { to: "/reportes", icon: FileBarChart, label: "Reportes disponibles", n: k?.reports, tone: "#22D3C5" },
+        { to: "/cotizador", icon: Receipt, label: "Cotizaciones enviadas", n: k?.quotes, tone: "#E6197E" },
       ];
 
   return (
@@ -67,7 +68,7 @@ export default function Home() {
             <Link to={c.to} className="group block">
               <Card className="h-full transition hover:-translate-y-0.5 hover:border-white/20">
                 <c.icon className="mb-4 size-5" style={{ color: c.tone }} />
-                <div className="text-4xl font-black text-white">{c.n == null ? "—" : <AnimatedNumber value={c.n} format={COUNT} />}</div>
+                <div className="text-4xl font-black text-white">{!k ? <Skeleton className="h-10 w-16" /> : c.n == null ? "—" : <AnimatedNumber value={c.n} format={COUNT} />}</div>
                 <div className="mt-1 flex items-center justify-between text-sm text-slate-400">{c.label}<ArrowRight className="size-4 opacity-0 transition group-hover:translate-x-1 group-hover:opacity-100" /></div>
               </Card>
             </Link>

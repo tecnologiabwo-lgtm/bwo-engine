@@ -1,3 +1,4 @@
+import { ListSkeleton, CardsSkeleton, GridSkeleton, PageSkeleton } from "./skeleton.jsx";
 import { cn } from "@/shared/lib/utils";
 import { Loader2 } from "lucide-react";
 
@@ -79,8 +80,10 @@ export function Empty({ icon: Icon, title, children }) {
   );
 }
 
-export function Spinner({ label = "Cargando…" }) {
-  return <div className="flex items-center justify-center gap-2 py-16 text-sm text-slate-400"><Loader2 className="size-4 animate-spin" />{label}</div>;
+/** Estado de carga de una pantalla o sección: ahora es un skeleton con la
+ *  forma del contenido (variant: page | list | cards | grid). */
+export function Spinner({ variant = "list" }) {
+  return <PageSkeletonInline variant={variant} />;
 }
 
 export function ErrorBox({ error, onRetry }) {
@@ -91,4 +94,11 @@ export function ErrorBox({ error, onRetry }) {
       {onRetry && <button className="ml-3 underline" onClick={onRetry}>Reintentar</button>}
     </div>
   );
+}
+
+function PageSkeletonInline({ variant }) {
+  if (variant === "page") return <PageSkeleton />;
+  if (variant === "cards") return <CardsSkeleton />;
+  if (variant === "grid") return <GridSkeleton />;
+  return <div role="status" aria-label="Cargando"><ListSkeleton /><span className="sr-only">Cargando…</span></div>;
 }

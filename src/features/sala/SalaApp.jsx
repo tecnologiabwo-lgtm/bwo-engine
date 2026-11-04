@@ -144,7 +144,7 @@ export default function SalaApp() {
   const chooseTab = (k) => { setTab(k); try { localStorage.setItem("sala.tab", k); } catch {} };
 
   if (err && !cals?.length) return <ErrorBox error={`No se pudo abrir la Sala: ${err}. ¿Se aplicó la migración 0005?`} onRetry={() => loadCals()} />;
-  if (!cals) return <Spinner />;
+  if (!cals) return <Spinner variant="page" />;
 
   const approved = list.filter((p) => RANK[p.status] >= 2).length;
   const late = list.filter((p) => timing(p).late).length;

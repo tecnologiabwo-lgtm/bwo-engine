@@ -3,7 +3,7 @@ import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { LogOut, Menu, X, ChevronsUpDown, UserCircle2 } from "lucide-react";
 import { LiquidGlassCard } from "@/shared/ui/liquid-glass";
-import { Spinner } from "@/shared/ui/primitives";
+import { PageSkeleton } from "@/shared/ui/skeleton";
 import { useAuth } from "@/features/auth/auth";
 import { useClient } from "@/features/clients/clientContext";
 import { cn } from "@/shared/lib/utils";
@@ -98,7 +98,7 @@ export default function AppShell() {
           )}
         </AnimatePresence>
         <main className="min-w-0 flex-1 pt-14 lg:pt-0">
-          <Suspense fallback={<Spinner label="Cargando módulo…" />}>
+          <Suspense fallback={<PageSkeleton />}>
             <motion.div key={loc.pathname} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
               <Outlet />
             </motion.div>
