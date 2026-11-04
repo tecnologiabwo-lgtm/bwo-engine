@@ -1,7 +1,7 @@
 /* Audiencia («Público»): lectura por encabezado y separación Instagram / Facebook.
    Datos sintéticos (ningún dato de cliente). */
-import { parseAudienceCsv, compareAudience } from "../src/modules/consolidador/lib/audience.js";
-import { resolveSeries } from "../src/modules/consolidador/lib/series.js";
+import { parseAudienceCsv, compareAudience } from "../src/features/consolidador/lib/audience.js";
+import { resolveSeries } from "../src/features/consolidador/lib/series.js";
 
 let PASS = 0, FAIL = 0; const fails = [];
 const check = (scn, label, cond, detail = "") => { if (cond) PASS++; else { FAIL++; fails.push(`[${scn}] ${label} ${detail}`); } };

@@ -4,7 +4,7 @@ export default {
   content: [
     "./index.html",
     "./src/**/*.{js,jsx}",
-    "!./src/modules/consolidador/**",
+    "!./src/features/consolidador/**",
   ],
   corePlugins: { preflight: false },
   theme: {

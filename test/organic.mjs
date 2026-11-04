@@ -1,6 +1,6 @@
 /* Ritmo de publicación semanal: feed vs historias por semana (lun–dom).
    Verdad calculada por fuerza bruta, independiente de lib/organic.js. */
-import { weeklyPosts, classifyPost } from "../src/modules/consolidador/lib/organic.js";
+import { weeklyPosts, classifyPost } from "../src/features/consolidador/lib/organic.js";
 
 let PASS = 0, FAIL = 0; const failures = [];
 const check = (scn, label, cond, detail = "") => { if (cond) PASS++; else { FAIL++; if (failures.length < 40) failures.push(`[${scn}] ${label} ${detail}`); } };

@@ -1,10 +1,10 @@
 /* Pruebas de los motores de BWO Engine: cotizador, calculadora ROI y Sala.
    Ejecutar: node test/engine.mjs  (incluido en npm test) */
-import { computeQuote, toggleItem } from "../src/lib/quote.js";
-import { automation, funnel, roi } from "../src/lib/roi.js";
-import { safeCalc, factRows, timing, issues, parseImport, ctaPending } from "../src/lib/sala.js";
+import { computeQuote, toggleItem } from "../src/features/quotes/quote.js";
+import { automation, funnel, roi } from "../src/features/calculator/roi.js";
+import { safeCalc, factRows, timing, issues, parseImport, ctaPending } from "../src/features/sala/sala.js";
 
-import { DEFAULT_CATALOG as DEFAULT } from "../src/lib/catalogData.js";
+import { DEFAULT_CATALOG as DEFAULT } from "../src/features/pricing/catalogData.js";
 let ok = 0, fail = 0;
 const eq = (name, got, want) => {
   const pass = typeof want === "number" && Number.isFinite(want) ? Math.abs(got - want) < 1e-6 : JSON.stringify(got) === JSON.stringify(want);

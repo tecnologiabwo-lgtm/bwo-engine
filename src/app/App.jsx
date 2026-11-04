@@ -1,15 +1,15 @@
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
-import { AuthProvider, useAuth } from "@/lib/auth";
-import { ClientProvider, useClient } from "@/lib/clientContext";
-import { supabaseConfigured } from "@/lib/supabase";
-import { ToastProvider } from "@/components/ui/toast";
-import { Spinner, Empty, ErrorBox } from "@/components/ui/primitives";
+import { AuthProvider, useAuth } from "@/features/auth/auth";
+import { ClientProvider, useClient } from "@/features/clients/clientContext";
+import { supabaseConfigured } from "@/shared/lib/supabase";
+import { ToastProvider } from "@/shared/ui/toast";
+import { Spinner, Empty, ErrorBox } from "@/shared/ui/primitives";
 import { Users2 } from "lucide-react";
 import AppShell, { Backdrop } from "./AppShell.jsx";
-import { SessionGuard } from "@/lib/sessionGuard";
+import { SessionGuard } from "@/features/auth/sessionGuard";
 import { Hourglass, ShieldOff } from "lucide-react";
-import Login from "../pages/Login.jsx";
-import Account from "../pages/Account.jsx";
+import Login from "@/features/auth/Login.jsx";
+import Account from "@/features/auth/Account.jsx";
 import { MODULES } from "./modules.js";
 
 /** Pantalla para cuentas que aún no puede usar la plataforma. */

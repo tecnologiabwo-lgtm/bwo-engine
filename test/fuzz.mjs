@@ -2,8 +2,8 @@
    La verdad se calcula sumando desde los anuncios; la herramienta nunca ve
    esa verdad, solo los archivos .xlsx fabricados. */
 import * as XLSX from "xlsx";
-import { parseWorkbook, buildModel, LEVEL_LABEL } from "../src/modules/consolidador/lib/parser.js";
-import { buildReportHtml } from "../src/modules/consolidador/lib/report.js";
+import { parseWorkbook, buildModel, LEVEL_LABEL } from "../src/features/consolidador/lib/parser.js";
+import { buildReportHtml } from "../src/features/consolidador/lib/report.js";
 
 let PASS = 0, FAIL = 0; const failures = [];
 const check = (scn, label, cond, detail = "") => { if (cond) PASS++; else { FAIL++; if (failures.length < 40) failures.push(`[${scn}] ${label} ${detail}`); } };

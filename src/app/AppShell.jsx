@@ -2,11 +2,11 @@ import { Suspense, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
 import { LogOut, Menu, X, ChevronsUpDown, UserCircle2 } from "lucide-react";
-import { LiquidGlassCard } from "@/components/ui/liquid-glass";
-import { Spinner } from "@/components/ui/primitives";
-import { useAuth } from "@/lib/auth";
-import { useClient } from "@/lib/clientContext";
-import { cn } from "@/lib/utils";
+import { LiquidGlassCard } from "@/shared/ui/liquid-glass";
+import { Spinner } from "@/shared/ui/primitives";
+import { useAuth } from "@/features/auth/auth";
+import { useClient } from "@/features/clients/clientContext";
+import { cn } from "@/shared/lib/utils";
 import { modulesFor, labelFor } from "./modules.js";
 
 export function Backdrop() {

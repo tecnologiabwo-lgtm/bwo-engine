@@ -13,23 +13,23 @@ import { Home, Users2, LayoutGrid, Clapperboard, BarChart3, FileBarChart, Calcul
 
 export const MODULES = [
   { id: "inicio", path: "inicio", label: "Inicio", icon: Home, roles: ["admin", "viewer"],
-    Component: lazy(() => import("../pages/Home.jsx")) },
+    Component: lazy(() => import("../features/home/Home.jsx")) },
   { id: "clientes", path: "clientes", label: "Clientes y accesos", icon: Users2, roles: ["admin"],
-    Component: lazy(() => import("../modules/clientes/ClientesApp.jsx")) },
+    Component: lazy(() => import("../features/clients/ClientesApp.jsx")) },
   { id: "feed", path: "feed", label: "Feed Planner", viewerLabel: "Mi feed", icon: LayoutGrid, roles: ["admin", "viewer"], needsClient: true, fullBleed: true,
-    Component: lazy(() => import("../modules/feed/FeedApp.jsx")) },
+    Component: lazy(() => import("../features/feed/FeedApp.jsx")) },
   { id: "sala", path: "sala", label: "Sala de producción", viewerLabel: "Guiones", icon: Clapperboard, roles: ["admin", "viewer"], needsClient: true,
-    Component: lazy(() => import("../modules/sala/SalaApp.jsx")) },
+    Component: lazy(() => import("../features/sala/SalaApp.jsx")) },
   { id: "consolidador", path: "consolidador", label: "Consolidador Meta Ads", icon: BarChart3, roles: ["admin"], canvas: "light",
-    Component: lazy(() => import("../modules/consolidador/ConsolidadorApp.jsx")) },
+    Component: lazy(() => import("../features/consolidador/ConsolidadorApp.jsx")) },
   { id: "reportes", path: "reportes", label: "Reportes publicados", viewerLabel: "Mis reportes", icon: FileBarChart, roles: ["admin", "viewer"], needsClient: true,
-    Component: lazy(() => import("../modules/reportes/ReportesApp.jsx")) },
+    Component: lazy(() => import("../features/reports/ReportesApp.jsx")) },
   { id: "cotizador", path: "cotizador", label: "Cotizador", viewerLabel: "Cotizar servicios", icon: Receipt, roles: ["admin", "viewer"],
-    Component: lazy(() => import("../modules/cotizador/CotizadorApp.jsx")) },
+    Component: lazy(() => import("../features/quotes/CotizadorApp.jsx")) },
   { id: "calculadora", path: "calculadora", label: "Calculadora ROI", icon: Calculator, roles: ["admin", "viewer"],
-    Component: lazy(() => import("../modules/calculadora/CalculadoraApp.jsx")) },
+    Component: lazy(() => import("../features/calculator/CalculadoraApp.jsx")) },
   { id: "precios", path: "precios", label: "Precios y planes", icon: Tags, roles: ["admin"],
-    Component: lazy(() => import("../modules/precios/PreciosApp.jsx")) },
+    Component: lazy(() => import("../features/pricing/PreciosApp.jsx")) },
 ];
 
 export const modulesFor = (role) => MODULES.filter((m) => m.roles.includes(role));
