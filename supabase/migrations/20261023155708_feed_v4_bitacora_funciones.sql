@@ -1,27 +1,4 @@
--- ============================================================
---  FEED PLANNER · MIGRACIÓN v4 — Bitácora de publicaciones
---  Ejecutar UNA vez en Supabase → SQL Editor → Run.
---  Aditiva: no borra datos ni columnas existentes.
--- ============================================================
-
--- 1) Tabla de eventos (RLS activado en la misma migración)
-create table if not exists post_events (
-  id         uuid primary key default gen_random_uuid(),
-  post_id    uuid not null references posts(id) on delete cascade,
-  type       text not null,          -- created|sent|changes|updated|edited|approved|published|archived|restored
-  actor      text not null default 'BigWay',
-  note       text,
-  created_at timestamptz not null default now()
-);
-create index if not exists idx_events_post on post_events(post_id, created_at);
-
-alter table post_events enable row level security;
-
-create policy agency_all on post_events
-  for all to authenticated using (true) with check (true);
--- El público (anon) no toca esta tabla: escribe solo por las funciones de abajo,
--- y lee solo lo que get_client_feed le devuelve.
-
+-- Feed Planner v4 (parte 2): funciones y relleno histórico
 -- 2) El feed del cliente incluye su bitácora
 create or replace function get_client_feed(p_token uuid)
 returns json language sql security definer set search_path = public as $$

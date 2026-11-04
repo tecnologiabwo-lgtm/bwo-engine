@@ -1,0 +1,13 @@
+{
+  "20261023154728_feed_v3_portadas_aprobacion_archivo.sql": "85f4344681bf3451",
+  "20261023155653_feed_v4_bitacora_tabla.sql": "432369b167b8f35c",
+  "20261023155708_feed_v4_bitacora_funciones.sql": "8ae4c781bcf8c2c4",
+  "20261023155731_engine_core_a_perfiles_permisos.sql": "f5e64f3d9b27275d",
+  "20261023155744_engine_core_b_catalogo_cotizaciones.sql": "c99e6e6d649c767b",
+  "20261023155804_engine_core_c_sala_reportes.sql": "74e62a33a18dd9b2",
+  "20261023155828_price_seed.sql": "0bd5ab87596da2a3",
+  "20261023155845_auth_registro_verificacion.sql": "02aa466a0bcc5be5",
+  "20261023155902_programas_bwo.sql": "b0825738fa4e9e5d",
+  "20261023155908_programa_01.sql": "d6e38e340ebc6b18",
+  "20261023155933_endurecimiento.sql": "60fa98e0cef86ff2"
+}

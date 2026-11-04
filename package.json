@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "test": "node test/fuzz.mjs && node test/series.mjs && node test/organic.mjs && node test/audience.mjs && node test/engine.mjs"
+    "test": "node scripts/lint-migrations.mjs && node test/fuzz.mjs && node test/series.mjs && node test/organic.mjs && node test/audience.mjs && node test/engine.mjs",
+    "migration:new": "node scripts/new-migration.mjs",
+    "migration:lock": "node scripts/lint-migrations.mjs --update"
   },
   "dependencies": {
     "@number-flow/react": "^0.6.2",
