@@ -4,6 +4,7 @@ import { Modal, Button, Field, Input, Textarea, Select, Badge } from "@/shared/u
 import { useToast } from "@/shared/ui/toast";
 import { FORMATS, STATUS, EVENTS, canClientAct } from "../logic.js";
 import { uploadImage, pickFiles } from "../media.js";
+import { LinkedText } from "@/shared/ui/linked-text";
 
 const fmtDate = (s) => new Date(s).toLocaleString("es-ES", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 
@@ -18,7 +19,7 @@ function Timeline({ post }) {
         <li key={i} className="flex gap-2 text-xs">
           <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full text-[10px] text-white" style={{ background: it.color }}>{it.ico}</span>
           <div><span className="font-semibold text-slate-200">{it.label}</span> <span className="text-slate-500">· {it.who} · {fmtDate(it.at)}</span>
-            {it.note && <div className="mt-0.5 whitespace-pre-line text-slate-300">{it.note}</div>}</div>
+            {it.note && <LinkedText as="div" text={it.note} className="mt-0.5 text-slate-300" />}</div>
         </li>
       ))}
     </ol>
@@ -96,7 +97,7 @@ export default function PostModal({ post, open, onClose, isAdmin, pillars, clien
           </> : <>
             <div className="flex flex-wrap items-center gap-2"><span className="rounded-full px-2 py-0.5 text-[11px] font-bold text-white" style={{ background: st.color }}>{st.ico} {st.client}</span>
               {d.scheduled_date && <Badge color="slate">{d.scheduled_date.split("-").reverse().join("/")}</Badge>}<Badge color="slate">{(FORMATS[d.format] || FORMATS.post_v).label}</Badge></div>
-            <p className="whitespace-pre-line text-sm text-slate-200">{d.caption || <span className="text-slate-500">Sin copy</span>}</p>
+            {d.caption ? <LinkedText as="p" text={d.caption} className="text-sm text-slate-200" /> : <p className="text-sm text-slate-500">Sin copy</p>}
             {canClientAct(post) && <Field label="Comentario" hint="Obligatorio para pedir cambios; opcional al aprobar."><Textarea rows={3} value={note} onChange={(e) => setNote(e.target.value)} placeholder="¿Qué te gustaría ajustar?" /></Field>}
           </>}
           {d.id && <div><div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-slate-400">Historial</div><Timeline post={post} /></div>}

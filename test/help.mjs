@@ -1,0 +1,16 @@
+import { search, slugify, norm } from "../src/features/help/search.js";
+import { ARTICLES, SECTIONS } from "../src/features/help/content.js";
+let ok = 0, fail = 0; const t = (n, c) => (c ? ok++ : (fail++, console.log("FALLA", n)));
+t("sin acentos", norm("Aprobación") === "aprobacion");
+t("aprobar → feed cliente", search(ARTICLES, "cómo apruebo mi feed")[0]?.slug === "tutorial-feed-cliente" || search(ARTICLES, "aprobar feed")[0]?.slug === "tutorial-feed-cliente");
+t("programa 02", search(ARTICLES, "máquina de facturación")[0]?.slug === "programas-bwo");
+t("teleprompter", search(ARTICLES, "teleprompter").some((a) => a.slug === "tutorial-teleprompter"));
+t("cómo apruebo (verbo irregular)", search(ARTICLES, "cómo apruebo").some((a) => a.slug === "tutorial-feed-cliente"));
+t("vacío", search(ARTICLES, "  de la ").length === 0);
+t("slug", slugify("¿Qué es BWO Engine?") === "que-es-bwo-engine");
+t("slugs únicos", new Set(ARTICLES.map((a) => a.slug)).size === ARTICLES.length);
+t("slugs válidos", ARTICLES.every((a) => /^[a-z0-9-]{2,80}$/.test(a.slug)));
+t("secciones válidas", ARTICLES.every((a) => SECTIONS.some((s) => s.id === a.section)));
+t("todas las secciones tienen contenido", SECTIONS.every((s) => ARTICLES.some((a) => a.section === s.id)));
+console.log(`CENTRO DE AYUDA · VERIFICACIONES: ${ok + fail} · OK: ${ok} · FALLOS: ${fail}`);
+process.exit(fail ? 1 : 0);

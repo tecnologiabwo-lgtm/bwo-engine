@@ -49,7 +49,8 @@ export default function PieceDrawer({ p, comments, isAdmin, onClose, onEdit, onS
           <div className="flex flex-wrap gap-2">
             {canDecide && p.status !== "aprobado" && <Button variant="ok" onClick={() => setStatus("aprobado", null, "Guion aprobado")} loading={busy}><Check className="size-4" />Aprobar guion</Button>}
             {next && <Button onClick={() => setStatus(next[0])} loading={busy}>{next[1]}</Button>}
-            {isVideo(p) && <Button variant="ghost" onClick={onShoot}><Video className="size-4" />Modo grabación</Button>}
+            {isVideo(p) && <Button variant="ghost" onClick={() => onShoot(false)}><Video className="size-4" />Modo grabación</Button>}
+            {isVideo(p) && <Button onClick={() => onShoot(true)}><Video className="size-4" />Teleprompter + cámara</Button>}
           </div>
 
           {p.decision?.q && (

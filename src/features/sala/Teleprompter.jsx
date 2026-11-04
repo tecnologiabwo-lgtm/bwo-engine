@@ -1,9 +1,10 @@
 import { useEffect, useRef, useState } from "react";
 import { supabase } from "@/shared/lib/supabase";
+import ScrollPrompter from "./ScrollPrompter.jsx";
 
 /** Modo grabación a pantalla completa: una toma a la vez, letra grande,
  *  cronómetro y pantalla siempre encendida (Wake Lock). Solo la agencia marca tomas. */
-export default function Teleprompter({ ids, pieces, isAdmin, onClose, onDone }) {
+export default function Teleprompter({ ids, pieces, isAdmin, onClose, onDone, startScroll = false }) {
   const list = ids.map((id) => pieces.find((p) => p.id === id)).filter(Boolean);
   const [pi, setPi] = useState(0);
   const first = list[0];
@@ -11,6 +12,7 @@ export default function Teleprompter({ ids, pieces, isAdmin, onClose, onDone }) 
   const [size, setSize] = useState(1);
   const [clock, setClock] = useState({ run: false, t0: 0, acc: 0, now: 0 });
   const wake = useRef(null);
+  const [scroll, setScroll] = useState(startScroll);
 
   useEffect(() => {
     navigator.wakeLock?.request("screen").then((w) => (wake.current = w)).catch(() => {});
@@ -40,6 +42,7 @@ export default function Teleprompter({ ids, pieces, isAdmin, onClose, onDone }) 
 
   useEffect(() => {
     const k = (e) => {
+      if (scroll) return;
       if (e.key === "Escape") onClose();
       else if (e.key === "ArrowLeft") prev();
       else if ((e.key === "ArrowRight" || e.key === " ") && e.target.tagName !== "BUTTON") { e.preventDefault(); next(); }
@@ -50,11 +53,13 @@ export default function Teleprompter({ ids, pieces, isAdmin, onClose, onDone }) 
   if (!p || !b) return (
     <div className="fixed inset-0 z-[60] grid place-items-center bg-[#0B0B18] text-white"><div className="text-center"><p>Esta pieza no tiene tomas.</p><button className="mt-3 underline" onClick={onClose}>Salir</button></div></div>
   );
+  if (scroll) return <ScrollPrompter piece={p} onClose={() => (startScroll ? onClose() : setScroll(false))} />;
   const px = [26, 32, 40, 50][size];
   return (
     <div className="fixed inset-0 z-[60] flex flex-col bg-[#0B0B18] px-4 text-[#F4F4FA]" role="dialog" aria-modal="true" aria-label="Modo grabación">
       <div className="flex flex-wrap items-center gap-3 py-3">
         <div className="min-w-0 flex-1 text-sm font-semibold opacity-85">{list.length > 1 && `Pieza ${pi + 1} de ${list.length} · `}{p.title}{p.num ? ` #${p.num}` : ""}</div>
+        <button onClick={() => setScroll(true)} className="rounded-lg bg-bwo-cerise px-3 py-1.5 text-sm font-semibold">Teleprompter + cámara</button>
         <button onClick={() => setSize((size + 1) % 4)} className="rounded-lg bg-white/10 px-3 py-1.5 text-sm font-semibold">A{["", "+", "++", "+++"][size]}</button>
         <button onClick={onClose} className="rounded-lg bg-white/10 px-3 py-1.5 text-sm font-semibold">Salir</button>
       </div>

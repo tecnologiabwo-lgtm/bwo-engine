@@ -14,6 +14,7 @@ import PostModal from "./components/PostModal.jsx";
 import StoriesBar from "./components/StoriesBar.jsx";
 import SharePanel from "./components/SharePanel.jsx";
 import ProfilePanel from "./components/ProfilePanel.jsx";
+import CalendarView from "./components/CalendarView.jsx";
 
 /* Feed Planner en React. Usa las mismas tablas, estados y eventos que el Feed
    clásico (/feed/panel.html, /feed/cliente.html) y el aislado, así que las tres
@@ -39,36 +40,6 @@ function Tabs({ value, onChange, items }) {
     <div className="mb-4 flex gap-1 overflow-x-auto rounded-xl border border-white/10 bg-white/[0.03] p-1" role="tablist">
       {items.map(([k, l]) => <button key={k} role="tab" aria-selected={value === k} onClick={() => onChange(k)}
         className={cn("whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-semibold transition", value === k ? "bg-bwo-violet text-white" : "text-slate-400 hover:text-white")}>{l}</button>)}
-    </div>
-  );
-}
-
-function Calendar({ posts, onOpen }) {
-  const groups = useMemo(() => {
-    const m = new Map();
-    for (const p of [...posts].sort((a, b) => (a.scheduled_date || "9").localeCompare(b.scheduled_date || "9"))) {
-      const k = p.scheduled_date ? p.scheduled_date.slice(0, 7) : "sin-fecha";
-      if (!m.has(k)) m.set(k, []); m.get(k).push(p);
-    }
-    return [...m];
-  }, [posts]);
-  if (!posts.length) return <Empty icon={LayoutGrid} title="Sin publicaciones" />;
-  return (
-    <div className="space-y-5">
-      {groups.map(([k, list]) => (
-        <div key={k}>
-          <div className="mb-2 text-sm font-bold capitalize text-white">{k === "sin-fecha" ? "Sin fecha" : new Date(k + "-01T12:00").toLocaleDateString("es-ES", { month: "long", year: "numeric" })}</div>
-          <div className="divide-y divide-white/5 rounded-xl border border-white/10">
-            {list.map((p) => { const st = STATUS[p.status] || STATUS.draft; return (
-              <button key={p.id} onClick={() => onOpen(p)} className="flex w-full items-center gap-3 px-3 py-2 text-left hover:bg-white/5">
-                <div className="size-12 shrink-0 overflow-hidden rounded bg-white/5">{thumbOf(p) && <img src={thumbOf(p)} alt="" className="size-full object-cover" />}</div>
-                <div className="w-24 shrink-0 text-xs text-slate-400">{p.scheduled_date ? p.scheduled_date.split("-").reverse().join("/") : "—"}</div>
-                <div className="min-w-0 flex-1 truncate text-sm text-slate-200">{p.caption || "Sin copy"}</div>
-                <span className="shrink-0 rounded-full px-2 py-0.5 text-[10px] font-bold text-white" style={{ background: st.color }}>{st.label}</span>
-              </button>); })}
-          </div>
-        </div>
-      ))}
     </div>
   );
 }
@@ -186,7 +157,8 @@ function ReactFeed({ client, isAdmin, actor }) {
           </aside>
         </div>
       )}
-      {tab === "calendario" && <Calendar posts={visible} onOpen={setEditing} />}
+      {tab === "calendario" && <CalendarView posts={visible} stories={data.stories} perWeek={(data.client || client).frequency_per_week} isAdmin={isAdmin} onOpen={setEditing}
+        onCreate={(date) => setEditing({ format: "post_v", status: "draft", images: [], caption: "", pinned: false, scheduled_date: date })} />}
       {tab === "archivo" && <ArchiveTab clientId={client.id} actor={actor} onChanged={load} />}
       {tab === "enlaces" && <SharePanel client={data.client || client} onChanged={load} />}
       {tab === "perfil" && <ProfilePanel key={data.client?.id} client={data.client || client} pillars={data.pillars} onChanged={load} />}

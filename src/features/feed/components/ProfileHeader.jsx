@@ -1,4 +1,5 @@
 import { handleClean } from "../logic.js";
+import { LinkedText, ExternalLink } from "@/shared/ui/linked-text";
 
 export default function ProfileHeader({ client, postsCount }) {
   const initials = (client.name || "?").split(/\s+/).map((w) => w[0]).slice(0, 2).join("").toUpperCase();
@@ -18,8 +19,8 @@ export default function ProfileHeader({ client, postsCount }) {
         </div>
         <div className="mt-2 text-sm font-semibold text-white">{client.name}</div>
         {client.category && <div className="text-xs text-slate-400">{client.category}</div>}
-        {client.bio && <div className="mt-1 whitespace-pre-line text-sm text-slate-300">{client.bio}</div>}
-        {client.link && <div className="mt-1 truncate text-sm text-bwo-turquoiseLt">{client.link}</div>}
+        {client.bio && <LinkedText as="div" text={client.bio} className="mt-1 text-sm text-slate-300" />}
+        {client.link && <div className="mt-1 truncate text-sm">🔗 <ExternalLink url={client.link} /></div>}
       </div>
     </div>
   );

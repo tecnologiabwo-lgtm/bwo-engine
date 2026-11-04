@@ -74,3 +74,49 @@ export function stats(posts, pillars) {
 }
 
 export const handleClean = (v) => String(v || "").replace(/[^a-z0-9._]/gi, "").toLowerCase();
+
+/* ── Carga de trabajo (vista Calendario) ─────────────────────────── */
+const pad2 = (n) => String(n).padStart(2, "0");
+export const isoDay = (d) => `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`;
+export const addDaysIso = (iso, n) => { const [y, m, d] = iso.split("-").map(Number); return isoDay(new Date(y, m - 1, d + n)); };
+/** Estados que aún requieren trabajo de la agencia o del cliente. */
+export const NOT_READY = ["draft", "changes", "pending"];
+
+/** Días consecutivos desde `from` con lo programado y su estado de avance. */
+export function workload(posts, stories = [], { from, days = 14, perWeek = null } = {}) {
+  const byDay = new Map();
+  for (const p of posts) if (p.scheduled_date) { if (!byDay.has(p.scheduled_date)) byDay.set(p.scheduled_date, []); byDay.get(p.scheduled_date).push(p); }
+  const storyDays = new Map();
+  for (const s of stories) if (s.scheduled_date) storyDays.set(s.scheduled_date, (storyDays.get(s.scheduled_date) || 0) + 1);
+  const list = Array.from({ length: days }, (_, i) => {
+    const date = addDaysIso(from, i), ps = byDay.get(date) || [];
+    const byStatus = Object.fromEntries(Object.keys(STATUS).map((k) => [k, ps.filter((p) => p.status === k).length]));
+    return { date, posts: ps, stories: storyDays.get(date) || 0, total: ps.length, byStatus, notReady: ps.filter((p) => NOT_READY.includes(p.status)).length };
+  });
+  const max = Math.max(1, ...list.map((d) => d.total));
+  const week = list.slice(0, 7);
+  const target = perWeek ? Number(perWeek) : null;
+  const next7 = week.reduce((a, d) => a + d.total, 0);
+  return {
+    days: list, max,
+    summary: {
+      next7, notReady7: week.reduce((a, d) => a + d.notReady, 0),
+      waitingClient7: week.reduce((a, d) => a + d.byStatus.pending, 0),
+      emptyDays7: week.filter((d) => !d.total).length,
+      busiest: list.reduce((b, d) => (d.total > (b?.total || 0) ? d : b), null),
+      target, gap: target == null ? null : next7 - target,
+      overdue: posts.filter((p) => p.scheduled_date && p.scheduled_date < from && NOT_READY.includes(p.status)).length,
+    },
+  };
+}
+
+/** Cuadrícula de mes (lunes a domingo) con días de relleno. */
+export function monthGrid(year, month) {
+  const first = new Date(year, month, 1), start = (first.getDay() + 6) % 7, daysIn = new Date(year, month + 1, 0).getDate();
+  const cells = [];
+  for (let i = 0; i < Math.ceil((start + daysIn) / 7) * 7; i++) {
+    const d = new Date(year, month, 1 - start + i);
+    cells.push({ date: isoDay(d), day: d.getDate(), inMonth: d.getMonth() === month });
+  }
+  return cells;
+}

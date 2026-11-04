@@ -4,6 +4,7 @@ import { useAuth } from "@/features/auth/auth";
 import { supabase, run } from "@/shared/lib/supabase";
 import { Badge, Button, Card, ErrorBox, Input, PageHeader, Select, Spinner } from "@/shared/ui/primitives";
 import { useToast } from "@/shared/ui/toast";
+import InvitePanel from "./InvitePanel.jsx";
 
 export default function ClientesApp() {
   const { profile, reload } = useAuth();
@@ -66,6 +67,7 @@ export default function ClientesApp() {
     <div>
       <PageHeader eyebrow="Agencia" title="Clientes y accesos"
         subtitle="Los clientes se crean en el Feed Planner. Aquí decides qué usuarios (espectadores) ven cada cliente en su portal: feed, guiones, reportes, cotizador y calculadora." />
+      <InvitePanel clients={data.clients} onDone={load} />
       {pending.length > 0 && (
         <Card className="mb-8 border-bwo-amber/30">
           <div className="mb-3 flex items-center gap-2 text-sm font-bold text-white"><Hourglass className="size-4 text-bwo-amber" />Solicitudes de registro <Badge color="amber">{pending.length}</Badge></div>
@@ -130,7 +132,7 @@ export default function ClientesApp() {
           </div>
         ))}
       </Card>
-      <p className="mt-3 text-xs text-slate-500">Los clientes se registran en la página de acceso («Crear cuenta»). Su cuenta queda pendiente hasta que la apruebes aquí; solo entonces ven los datos del cliente al que los vincules.</p>
+      <p className="mt-3 text-xs text-slate-500">Dos caminos: invítalos por correo (entran ya verificados) o que se registren en la página de acceso («Crear cuenta»); en ese caso su cuenta queda pendiente hasta que la apruebes aquí.</p>
     </div>
   );
 }

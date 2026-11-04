@@ -1,3 +1,4 @@
+import {linkHtml} from '../utils/linkHtml.js';
 import {BRAND} from '../config/env.js';
 import {FORMATS,STATUS} from '../config/constants.js';
 import {$,$$,setHTML,toast,closeModal,loadingState} from '../utils/ui.js';
@@ -139,7 +140,7 @@ function renderPost(){
         <div><span class="status-chip" style="background:color-mix(in srgb,${s.color} 15%,transparent);color:${s.color}">${s.ico} ${s.clientLabel}</span></div>
         ${p.scheduled_date?`<p class="datebox">📅 Publicación estimada: <b>${longDate(p.scheduled_date)}</b></p>`:''}
         ${p.approved_at?`<p class="okbox">✓ <b>Aprobado</b> el ${stamp(p.approved_at)} por <b>${esc(p.approved_by||'')}</b></p>`:''}
-        ${p.caption?`<p class="cap">${esc(p.caption)}</p>`:''}
+        ${p.caption?`<p class="cap">${linkHtml(p.caption)}</p>`:''}
         ${canAct(p)?`<div class="actions"><button class="btn ok" id="pOk">✓ Aprobar</button><button class="btn bad" id="pNo">↺ Pedir cambios</button></div>`
           :p.status==='approved'?`<div class="actions"><button class="btn ghost" id="pNo">↺ Pedir un cambio de última hora</button></div>`:''}
         <div class="cbox" id="cbox" hidden><textarea id="cText" maxlength="2000" placeholder="¿Qué te gustaría cambiar? (texto, imagen, fecha…)"></textarea>

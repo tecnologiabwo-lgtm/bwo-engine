@@ -9,6 +9,7 @@ import { AnimatedNumber } from "@/shared/ui/number";
 import TextAnimation from "@/shared/ui/scroll-text";
 import { Card } from "@/shared/ui/primitives";
 import { Skeleton } from "@/shared/ui/skeleton";
+import { Biwi } from "@/shared/ui/brand";
 
 const COUNT = { style: "decimal", maximumFractionDigits: 0 };
 
@@ -57,10 +58,15 @@ export default function Home() {
 
   return (
     <div>
-      <div className="mb-8 pt-2">
+      <div className="mb-8 flex flex-wrap items-end justify-between gap-6 pt-2">
+       <div>
         <div className="mb-2 text-xs font-bold uppercase tracking-[.2em] text-bwo-amber">{isAdmin ? "Agencia" : client?.name}</div>
         <TextAnimation as="h1" text={`Hola, ${name}.`} classname="text-4xl font-black tracking-tight text-white sm:text-5xl" />
         <p className="mt-2 text-slate-400">{isAdmin ? "Esto es lo que necesita atención hoy en todos los clientes." : "Esto es lo que necesitamos de ti."}</p>
+       </div>
+        <Biwi size={84} say={isAdmin ? "¿Algo nuevo para el equipo? Revisa los pendientes o deja un artículo en el Centro de ayuda." : "Si tienes dudas de cómo aprobar o qué significa cada estado, pregúntame en el Centro de ayuda."}>
+          <Link to="/ayuda" className="mt-1 inline-block text-xs font-semibold text-bwo-turquoiseLt underline underline-offset-2">Abrir Centro de ayuda →</Link>
+        </Biwi>
       </div>
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map((c, i) => (

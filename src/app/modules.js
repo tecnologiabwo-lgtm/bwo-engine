@@ -9,7 +9,7 @@
  * canvas: "dark" (por defecto) o "light" (módulo con su propio diseño claro).
  */
 import { lazy } from "react";
-import { Home, Users2, LayoutGrid, Clapperboard, BarChart3, FileBarChart, Calculator, Receipt, Tags, ShieldCheck, LineChart } from "lucide-react";
+import { Home, Users2, LayoutGrid, Clapperboard, BarChart3, FileBarChart, Calculator, Receipt, Tags, ShieldCheck, LineChart, Wrench, LifeBuoy } from "lucide-react";
 
 export const MODULES = [
   { id: "inicio", path: "inicio", label: "Inicio", icon: Home, roles: ["admin", "viewer"],
@@ -30,6 +30,10 @@ export const MODULES = [
     Component: lazy(() => import("../features/quotes/CotizadorApp.jsx")) },
   { id: "calculadora", path: "calculadora", label: "Calculadora ROI", icon: Calculator, roles: ["admin", "viewer"],
     Component: lazy(() => import("../features/calculator/CalculadoraApp.jsx")) },
+  { id: "herramientas", path: "herramientas", label: "Herramientas", icon: Wrench, roles: ["admin", "viewer"],
+    Component: lazy(() => import("../features/tools/ToolsApp.jsx")) },
+  { id: "ayuda", path: "ayuda", label: "Centro de ayuda", icon: LifeBuoy, roles: ["admin", "viewer"],
+    Component: lazy(() => import("../features/help/HelpApp.jsx")) },
   { id: "precios", path: "precios", label: "Precios y planes", icon: Tags, roles: ["admin"],
     Component: lazy(() => import("../features/pricing/PreciosApp.jsx")) },
   { id: "monitoreo", path: "monitoreo", label: "Auditoría y errores", icon: ShieldCheck, roles: ["admin"],

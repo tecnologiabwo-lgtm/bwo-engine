@@ -1,4 +1,5 @@
 import {esc} from '../utils/format.js';
+import {linkHtml,linkOne} from '../utils/linkHtml.js';
 /** Cabecera del perfil de Instagram. Solo recibe datos y devuelve HTML. */
 export function profileHeader(client,{postCount,stories=[],highlights=[],onStories='',tab='grid',onTab=''}={}){
   const pfp=client.photo
@@ -20,8 +21,8 @@ export function profileHeader(client,{postCount,stories=[],highlights=[],onStori
     <div class="ig-bio">
       <div class="nm">${esc(client.name)}</div>
       ${client.category?`<div class="cat">${esc(client.category)}</div>`:''}
-      ${client.bio?`<div>${esc(client.bio).replace(/\n/g,'<br>')}</div>`:''}
-      ${client.link?`<div class="lk">🔗 ${esc(client.link)}</div>`:''}
+      ${client.bio?`<div>${linkHtml(client.bio)}</div>`:''}
+      ${client.link?`<div class="lk">🔗 ${linkOne(client.link)}</div>`:''}
     </div>
   </div>
   ${highlights.length?`<div class="ig-hl">${hl}</div>`:''}

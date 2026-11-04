@@ -70,10 +70,10 @@ export function PageHeader({ title, subtitle, actions, eyebrow }) {
   );
 }
 
-export function Empty({ icon: Icon, title, children }) {
+export function Empty({ icon: Icon, title, children, biwi }) {
   return (
     <div className="grid place-items-center rounded-2xl border border-dashed border-white/10 px-6 py-14 text-center">
-      {Icon && <Icon className="mb-3 size-8 text-slate-500" />}
+      {biwi ? <img src="/brand/biwi.webp" alt="" className="mb-3 h-24 w-auto" /> : Icon && <Icon className="mb-3 size-8 text-slate-500" />}
       <div className="font-semibold text-slate-200">{title}</div>
       {children && <div className="mt-1 max-w-md text-sm text-slate-400">{children}</div>}
     </div>

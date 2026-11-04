@@ -1,3 +1,4 @@
+import { BwoMark, Biwi } from "@/shared/ui/brand";
 import { useState } from "react";
 import { Navigate, useSearchParams } from "react-router-dom";
 import { motion, AnimatePresence } from "motion/react";
@@ -58,12 +59,13 @@ export default function Login() {
           <TextAnimation as="p" letterAnime stagger={0.012} text="Feed, guiones, reportes, cotizaciones y proyecciones en un solo lugar."
             classname="mt-6 max-w-md text-lg text-slate-300"
             variants={{ hidden: { filter: "blur(4px)", opacity: 0, y: 12 }, visible: { filter: "blur(0px)", opacity: 1, y: 0, transition: { duration: 0.2 } } }} />
+          <Biwi className="mt-10" size={120} say="¡Hola! Soy Biwi. Aquí revisas tu feed, tus guiones y tus resultados con Big Way." />
         </div>
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
           <LiquidGlassCard borderRadius="24px" blurIntensity="lg" shadowIntensity="md" glowIntensity="md" className="p-8">
             <div className="relative z-10">
               <div className="mb-5 flex items-center gap-3">
-                <div className="grid size-11 place-items-center rounded-xl text-sm font-black text-white" style={{ background: "linear-gradient(135deg,#6C3BF5,#E6197E)" }}>WO</div>
+                <BwoMark className="h-12" />
                 <div><div className="text-lg font-extrabold text-white">BWO Engine</div><div className="text-xs text-slate-400">{mode === "login" ? "Ingresa con tu cuenta" : "Solicita acceso a tu portal"}</div></div>
               </div>
               {!sent && (

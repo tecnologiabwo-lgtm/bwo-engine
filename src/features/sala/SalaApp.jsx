@@ -206,9 +206,9 @@ export default function SalaApp() {
       </>)}
 
       {piece && <PieceDrawer p={piece} comments={comments.filter((c) => c.piece_id === piece.id)} isAdmin={isAdmin}
-        onClose={() => setOpen(null)} onEdit={() => { setEdit(piece); setOpen(null); }} onShoot={() => { setTp([piece.id]); setOpen(null); }} onDeleted={() => { setOpen(null); loadPieces(); }} />}
+        onClose={() => setOpen(null)} onEdit={() => { setEdit(piece); setOpen(null); }} onShoot={(scroll) => { setTp({ ids: [piece.id], scroll }); setOpen(null); }} onDeleted={() => { setOpen(null); loadPieces(); }} />}
       {edit && cal && <PieceForm calendar={cal} piece={edit === "new" ? null : edit} onClose={() => setEdit(null)} onSaved={(id) => { setEdit(null); loadPieces(); setOpen(id); }} />}
-      {tp && <Teleprompter ids={tp} pieces={pieces} isAdmin={isAdmin} onClose={() => { setTp(null); loadPieces(); }} onDone={() => { setTp(null); loadPieces(); }} />}
+      {tp && <Teleprompter ids={tp.ids || tp} startScroll={!!tp.scroll} pieces={pieces} isAdmin={isAdmin} onClose={() => { setTp(null); loadPieces(); }} onDone={() => { setTp(null); loadPieces(); }} />}
       {modal === "cal" && <CalendarForm clientId={clientId} onClose={() => setModal(null)} onSaved={(id) => { setModal(null); loadCals(id); }} />}
       {modal === "editcal" && cal && <CalendarForm clientId={clientId} cal={cal} onClose={() => setModal(null)} onSaved={(id) => { setModal(null); loadCals(id); }} />}
       {modal === "import" && <ImportForm clientId={clientId} onClose={() => setModal(null)} onDone={(id) => { setModal(null); loadCals(id); }} />}

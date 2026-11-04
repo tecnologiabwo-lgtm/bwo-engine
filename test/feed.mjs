@@ -1,6 +1,7 @@
 /* Pruebas de la lógica del Feed en React. */
 import { paginate, reorderPage, sortPosts, statusPatch, eventForStatus, thumbOf, stats, PAGE_CELLS, handleClean } from "../src/features/feed/logic.js";
 let ok = 0, fail = 0;
+const ok_ = (n, c) => (c ? ok++ : (fail++, console.log(`FALLA ${n}`)));
 const eq = (n, g, w) => (JSON.stringify(g) === JSON.stringify(w) ? ok++ : (fail++, console.log(`FALLA ${n}: ${JSON.stringify(g)} ≠ ${JSON.stringify(w)}`)));
 const posts = Array.from({ length: 25 }, (_, i) => ({ id: `p${i}`, sort: i, pinned: false, status: "pending" }));
 eq("6×3 = 18", PAGE_CELLS, 18);
@@ -28,5 +29,28 @@ const st = stats([{ status: "approved", pillar_id: "x", scheduled_date: "2026-11
 eq("conteo por estado", [st.byStatus.approved, st.byStatus.pending], [1, 1]);
 eq("frecuencia semanal", Math.round(st.perWeek * 10) / 10, 1);
 eq("usuario limpio", handleClean("@Mi Marca.VE!"), "mimarca.ve");
+// ── carga de trabajo
+{
+  const { workload, monthGrid, addDaysIso } = await import("../src/features/feed/logic.js");
+  const ps = [
+    { id: "a", scheduled_date: "2026-11-05", status: "draft" }, { id: "b", scheduled_date: "2026-11-05", status: "approved" },
+    { id: "c", scheduled_date: "2026-11-07", status: "pending" }, { id: "d", scheduled_date: "2026-11-20", status: "draft" },
+    { id: "e", scheduled_date: "2026-11-01", status: "changes" }, { id: "f", status: "draft" },
+  ];
+  const w = workload(ps, [{ scheduled_date: "2026-11-06" }], { from: "2026-11-04", days: 14, perWeek: 4 });
+  ok_("14 días", w.days.length === 14);
+  ok_("día con 2", w.days[1].total === 2 && w.days[1].notReady === 1);
+  ok_("historias", w.days[2].stories === 1);
+  ok_("próximos 7", w.summary.next7 === 3 && w.summary.notReady7 === 2 && w.summary.waitingClient7 === 1);
+  ok_("días vacíos", w.summary.emptyDays7 === 5);
+  ok_("brecha objetivo", w.summary.gap === -1);
+  ok_("atrasados", w.summary.overdue === 1);
+  ok_("más cargado", w.summary.busiest.date === "2026-11-05");
+  ok_("fuera de rango no cuenta", !w.days.some((d) => d.posts.some((p) => p.id === "d")));
+  ok_("cruce de mes", addDaysIso("2026-11-30", 1) === "2026-12-01");
+  const g = monthGrid(2026, 10); // noviembre 2026 empieza en domingo
+  ok_("mes en semanas completas", g.length % 7 === 0 && g[0].date === "2026-10-26" && g.filter((c) => c.inMonth).length === 30);
+}
+
 console.log(`FEED REACT · VERIFICACIONES: ${ok + fail} · OK: ${ok} · FALLOS: ${fail}`);
 if (fail) process.exit(1);

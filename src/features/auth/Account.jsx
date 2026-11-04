@@ -3,6 +3,7 @@ import { useAuth } from "@/features/auth/auth";
 import { supabase, run } from "@/shared/lib/supabase";
 import { useToast } from "@/shared/ui/toast";
 import { Button, Card, Field, Input, PageHeader } from "@/shared/ui/primitives";
+import { Biwi } from "@/shared/ui/brand";
 
 export default function Account() {
   const { profile, reload } = useAuth();
@@ -23,6 +24,7 @@ export default function Account() {
   return (
     <div className="max-w-xl">
       <PageHeader title="Mi cuenta" subtitle={`${profile?.email} · ${profile?.role === "admin" ? "Administrador (agencia)" : "Espectador (cliente)"}`} />
+      {new URLSearchParams(location.search).has("bienvenida") && <Biwi className="mb-6" size={88} say="¡Bienvenido a BWO Engine! Crea tu contraseña aquí abajo para entrar cuando quieras." />}
       <Card className="space-y-4">
         <Field label="Nombre visible"><Input value={name} onChange={(e) => setName(e.target.value)} /></Field>
         <Button onClick={saveName} loading={busy}>Guardar nombre</Button>

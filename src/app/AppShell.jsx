@@ -1,3 +1,4 @@
+import { BwoMark } from "@/shared/ui/brand";
 import { Suspense, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
@@ -41,7 +42,7 @@ function Sidebar({ onNavigate }) {
   return (
     <LiquidGlassCard glowIntensity="sm" shadowIntensity="sm" borderRadius="20px" blurIntensity="md" className="flex h-full w-[264px] flex-col p-4">
       <div className="mb-5 flex items-center gap-3 px-1">
-        <div className="grid size-10 place-items-center rounded-xl text-sm font-black text-white shadow-lg" style={{ background: "linear-gradient(135deg,#6C3BF5,#E6197E)" }}>WO</div>
+        <BwoMark className="h-11" />
         <div>
           <div className="text-sm font-extrabold leading-tight text-white">BWO Engine</div>
           <div className="text-[10px] text-slate-400">{role === "admin" ? "Agencia · Big Way Offices" : "Portal de clientes"}</div>

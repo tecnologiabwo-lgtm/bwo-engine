@@ -13,5 +13,6 @@
   "20261104151540_ping_y_enlaces_publicos.sql": "3d21e797ee804ace",
   "20261104151620_auditoria_y_errores.sql": "8668f1ec0db3e769",
   "20261104151638_estadisticas_mensuales.sql": "1fde18011f77215f",
-  "20261104151641_almacenamiento_feed.sql": "80af82f019bcc37c"
+  "20261104151641_almacenamiento_feed.sql": "80af82f019bcc37c",
+  "20261104191204_invitaciones_y_ayuda.sql": "1dcfd00e60957aae"
 }
