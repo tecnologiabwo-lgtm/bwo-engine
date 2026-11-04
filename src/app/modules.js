@@ -9,7 +9,7 @@
  * canvas: "dark" (por defecto) o "light" (módulo con su propio diseño claro).
  */
 import { lazy } from "react";
-import { Home, Users2, LayoutGrid, Clapperboard, BarChart3, FileBarChart, Calculator, Receipt, Tags, ShieldCheck } from "lucide-react";
+import { Home, Users2, LayoutGrid, Clapperboard, BarChart3, FileBarChart, Calculator, Receipt, Tags, ShieldCheck, LineChart } from "lucide-react";
 
 export const MODULES = [
   { id: "inicio", path: "inicio", label: "Inicio", icon: Home, roles: ["admin", "viewer"],
@@ -24,6 +24,8 @@ export const MODULES = [
     Component: lazy(() => import("../features/consolidador/ConsolidadorApp.jsx")) },
   { id: "reportes", path: "reportes", label: "Reportes publicados", viewerLabel: "Mis reportes", icon: FileBarChart, roles: ["admin", "viewer"], needsClient: true,
     Component: lazy(() => import("../features/reports/ReportesApp.jsx")) },
+  { id: "historico", path: "historico", label: "Histórico", viewerLabel: "Mi evolución", icon: LineChart, roles: ["admin", "viewer"], needsClient: true,
+    Component: lazy(() => import("../features/consolidador/HistoricoApp.jsx")) },
   { id: "cotizador", path: "cotizador", label: "Cotizador", viewerLabel: "Cotizar servicios", icon: Receipt, roles: ["admin", "viewer"],
     Component: lazy(() => import("../features/quotes/CotizadorApp.jsx")) },
   { id: "calculadora", path: "calculadora", label: "Calculadora ROI", icon: Calculator, roles: ["admin", "viewer"],

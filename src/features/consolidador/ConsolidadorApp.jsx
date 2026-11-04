@@ -18,6 +18,8 @@ import { Money, Diff } from "./ui/Money.jsx";
 import { Pills, TabPanel, PILLS_CSS } from "./ui/Pills.jsx";
 import { construirPayload, pedirAnalisis } from "./lib/ai.js";
 import { supabase } from "@/shared/lib/supabase";
+import { splitByMonth } from "./lib/stats.js";
+import { saveMonths } from "./historyApi.js";
 import { useClient } from "@/features/clients/clientContext";
 
 /* ============================================================
@@ -587,6 +589,20 @@ export default function ConsolidadorMetaAds() {
     () => (adRows.length ? buildModel(adRows, currency, campaignsCsv, groupBy) : null),
     [adRows, currency, campaignsCsv, groupBy]
   );
+  // ---- Histórico mensual: qué meses se guardarían con lo cargado ----
+  const monthSplit = useMemo(() => (model || Object.keys(series || {}).length ? splitByMonth(model, series) : null), [model, series]);
+  const [hist, setHist] = useState({ busy: false, done: "", error: "" });
+  async function saveHistory() {
+    if (!pub.clientId || !monthSplit?.months.length) return;
+    const target = engineClients.find((c) => c.id === pub.clientId);
+    if (!window.confirm(`¿Guardar ${monthSplit.months.length} mes(es) en el histórico de ${target?.name}? Si alguno ya existía, se reemplaza.`)) return;
+    setHist({ busy: true, done: "", error: "" });
+    try {
+      await saveMonths(pub.clientId, monthSplit, { currency, level: model?.effectiveLevel || "campaign", sources: (files || []).map((f) => f.name).slice(0, 40) });
+      setHist({ busy: false, done: `Guardado en el histórico de ${target?.name}: ${monthSplit.months.map((m) => m.slice(0, 7)).join(", ")}.`, error: "" });
+    } catch (e) { setHist({ busy: false, done: "", error: e.message }); }
+  }
+
   // si el nivel pedido no existe en los datos cargados, el modelo cae al
   // disponible más fino automáticamente (model.effectiveLevel lo indica)
   const activeLevel = model?.effectiveLevel || groupBy;
@@ -1725,6 +1741,38 @@ tr.tot td{border-top:2px solid var(--ink);background:var(--paper)}
               {pub.done && <div style={{ color: C.sea, fontSize: 13, fontWeight: 600, marginBottom: 6 }}>{pub.done}</div>}
               {pub.error && <div style={{ color: C.rust, fontSize: 12.5, marginBottom: 6 }}>{pub.error}</div>}
               <p className="sub" style={{ margin: 0 }}>Período: {model ? `${reportPeriod().from} → ${reportPeriod().to}` : "—"} (abarca todas las {levelLabel.toLowerCase()}s cargadas). Si ya existe un reporte para ese período, se reemplaza.</p>
+            </div>
+
+            <h3 style={{ marginTop: 28 }}>Guardar en el histórico mensual</h3>
+            <p className="sub">Guarda las cifras de cada mes para revisarlas por mes, trimestre y año en «Histórico». Usa el mismo cliente destino de arriba. Con desglose diario el reparto es exacto; si no, se estima por días.</p>
+            <div className="card" style={{ padding: "18px 20px" }}>
+              {monthSplit?.months.length ? (
+                <>
+                  <table>
+                    <thead><tr><th>Mes</th><th className="r">Inversión</th><th className="r">Resultados</th><th className="r">Entidades</th><th className="r">Métricas orgánicas</th><th>Origen</th></tr></thead>
+                    <tbody>{monthSplit.months.map((m) => {
+                      const a = monthSplit.ads.filter((x) => x.month === m), o = monthSplit.organic.filter((x) => x.month === m);
+                      return (
+                        <tr key={m}>
+                          <td className="mono">{m.slice(0, 7)}</td>
+                          <td className="r">{money(a.reduce((t, x) => t + x.spend, 0), currency)}</td>
+                          <td className="r">{int(a.reduce((t, x) => t + x.results, 0))}</td>
+                          <td className="r">{a.length}</td>
+                          <td className="r">{o.length}</td>
+                          <td style={{ fontSize: 11.5, color: a.some((x) => x.prorated) ? C.amber : C.sea }}>{a.some((x) => x.prorated) ? "estimado por días" : "exacto"}</td>
+                        </tr>
+                      );
+                    })}</tbody>
+                  </table>
+                  {monthSplit.warnings.length > 0 && <ul style={{ margin: "10px 0 0", paddingLeft: 18, fontSize: 12, color: C.slate }}>{monthSplit.warnings.slice(0, 6).map((w, i) => <li key={i}>{w}</li>)}</ul>}
+                  <div style={{ marginTop: 12, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+                    <button className="btn" disabled={!pub.clientId || hist.busy} onClick={saveHistory}>{hist.busy ? "Guardando…" : "Guardar en el histórico"}</button>
+                    {!pub.clientId && <span style={{ fontSize: 12, color: C.slate }}>Elige primero el cliente destino.</span>}
+                    {hist.done && <span style={{ color: C.sea, fontSize: 13, fontWeight: 600 }}>{hist.done}</span>}
+                    {hist.error && <span style={{ color: C.rust, fontSize: 12.5 }}>{hist.error}</span>}
+                  </div>
+                </>
+              ) : <div className="empty">No hay datos con fechas para separar por mes.</div>}
             </div>
           </div>
         )}
